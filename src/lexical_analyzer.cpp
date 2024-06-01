@@ -5,58 +5,14 @@
 #include "data/error_codes.h"
 #include "data/symbol_table.h"
 
-enum Terminals {
-    IDENT,
-    OPEN_P,         // (
-    CLOSE_P,        // )
-    OPEN_SB,        // [
-    CLOSE_SB,       // ]
-    OPEN_CB,        // {
-    CLOSE_CB,       // }
-    COMMA,          // ,
-    SEMICOLON,      // ;
-    MULTIPLY,       // *
-    DIVIDE,         // /
-    REMAINDER,      // %
-    ADD,            // +
-    SUB,            // -
-    ASSIGN,         // =
-    LESS_THAN,      // <
-    GREATER_THAN,   // >
-    LESS_EQUAL,     // <=
-    GREATER_EQUAL,  // >=
-    EQUAL,          // ==
-    NOT_EQUAL,      // !=
-    DEF,
-    NEW,
-    INT,
-    FLOAT,
-    STRING,
-    PRINT,
-    READ,
-    RETURN,
-    BREAK,
-    IF,
-    ELSE,
-    FOR,
-    INT_CONST,
-    FLOAT_CONST,
-    STRING_CONST,
-    NULL_CONST,  // null
-    AND,
-    OR,
-    NOT,
-    CALL
-};
-
-std::unordered_map<std::string, Terminals> Tokens = {
-    {"(", OPEN_P},       {")", CLOSE_P},      {"[", OPEN_SB},        {"]", CLOSE_SB},  {"{", OPEN_CB},
-    {"}", CLOSE_CB},     {",", COMMA},        {";", SEMICOLON},      {"=", ASSIGN},    {"<", LESS_THAN},
-    {">", GREATER_THAN}, {"<=", LESS_EQUAL},  {">=", GREATER_EQUAL}, {"==", EQUAL},    {"!=", NOT_EQUAL},
-    {"*", MULTIPLY},     {"/", DIVIDE},       {"%", REMAINDER},      {"+", ADD},       {"-", SUB},
-    {"def", DEF},        {"new", NEW},        {"int", INT},          {"float", FLOAT}, {"string", STRING},
-    {"print", PRINT},    {"read", READ},      {"return", RETURN},    {"break", BREAK}, {"if", IF},
-    {"else", ELSE},      {"for", FOR},        {"and", AND},          {"or", OR},       {"not", NOT},
+std::unordered_map<std::string, Symbols> TokenStrings = {
+    {"(", OPEN_P},       {")", CLOSE_P},      {"[", OPEN_SB},        {"]", CLOSE_SB},   {"{", OPEN_CB},
+    {"}", CLOSE_CB},     {",", COMMA},        {";", SEMICOLON},      {"=", ASSIGNMENT}, {"<", LESS_THAN},
+    {">", GREATER_THAN}, {"<=", LESS_EQUAL},  {">=", GREATER_EQUAL}, {"==", EQUAL},     {"!=", NOT_EQUAL},
+    {"*", MULTIPLY},     {"/", DIVISION},     {"%", REMAINDER},      {"+", ADDITION},   {"-", SUBTRACT},
+    {"def", DEF},        {"new", NEW},        {"int", INT},          {"float", FLOAT},  {"string", STRING},
+    {"print", PRINT},    {"read", READ},      {"return", RETURN},    {"break", BREAK},  {"if", IF},
+    {"else", ELSE},      {"for", FOR},        {"and", AND},          {"or", OR},        {"not", NOT},
     {"call", CALL},      {"null", NULL_CONST}};
 
 enum TokenParserStates {
@@ -69,7 +25,9 @@ enum TokenParserStates {
     DIFFERENT          // must find = after !
 };
 
-int lexical_analyser(std::string source) {
+int lexical_analyser(std::string source,
+                     std::list<int> &token_list,
+                     std::unordered_map<std::string, std::list<unsigned int>> &symbol_table) {
     unsigned int state = READ_SIMPLE, current_line = 1, current_pos = 0, size = source.size();
     char next;
     std::string current_token;
@@ -93,8 +51,8 @@ int lexical_analyser(std::string source) {
                     current_token += next;
                 } else if (next == '!') {
                     state == DIFFERENT;
-                } else if (Tokens[std::string(1, next)] < ASSIGN) {  // if token is 1-char and not < | > | =
-                    TokenList.push_back(Tokens[std::string(1, next)]);
+                } else if (TokenStrings[std::string(1, next)] < ASSIGNMENT) {  // if token is 1-char and not < | > | =
+                    token_list.push_back(TokenStrings[std::string(1, next)]);
                 } else {
                     return INVALID_CHAR;  // error: invalid character in line N
                 }
@@ -106,14 +64,14 @@ int lexical_analyser(std::string source) {
                     current_pos++;
                 } else {
                     state = READ_SIMPLE;
-                    if (Tokens.find(current_token) != Tokens.end()) {  // is keyword
-                        TokenList.push_back(Tokens[current_token]);
-                    } else if (SymbolTable.find(current_token) == SymbolTable.end()) {  // not in table
-                        SymbolTable[current_token] = {current_pos};
-                        TokenList.push_back(IDENT);
+                    if (TokenStrings.find(current_token) != TokenStrings.end()) {  // is keyword
+                        token_list.push_back(TokenStrings[current_token]);
+                    } else if (symbol_table.find(current_token) == symbol_table.end()) {  // not in table
+                        symbol_table[current_token] = {current_pos};
+                        token_list.push_back(IDENT);
                     } else {  // already in table
-                        SymbolTable[current_token].push_back(current_pos);
-                        TokenList.push_back(IDENT);
+                        symbol_table[current_token].push_back(current_pos);
+                        token_list.push_back(IDENT);
                     }
                     current_token.clear();
                 }
@@ -128,7 +86,7 @@ int lexical_analyser(std::string source) {
                     return INVALID_NUMBER_FORMAT;
                 } else {
                     state = READ_SIMPLE;
-                    TokenList.push_back(INT_CONST);
+                    token_list.push_back(INT_CONST);
                 }
                 break;
             case FLOAT_FRACTIONAL:
@@ -138,13 +96,13 @@ int lexical_analyser(std::string source) {
                     return INVALID_NUMBER_FORMAT;
                 } else {
                     state = READ_SIMPLE;
-                    TokenList.push_back(FLOAT_CONST);
+                    token_list.push_back(FLOAT_CONST);
                 }
                 break;
             case STRING_LITERAL:  // You can't escape! (it doesnt escape chars)
                 if (next == '\"') {
                     state == READ_SIMPLE;
-                    TokenList.push_back(STRING_CONST);
+                    token_list.push_back(STRING_CONST);
                 }
                 current_pos++;
                 break;
@@ -154,7 +112,7 @@ int lexical_analyser(std::string source) {
                     current_pos++;
                 }
                 state = READ_SIMPLE;
-                TokenList.push_back(Tokens[current_token]);
+                token_list.push_back(TokenStrings[current_token]);
                 current_token.clear();
                 break;
             case DIFFERENT:
@@ -162,7 +120,7 @@ int lexical_analyser(std::string source) {
                     current_token += next;
                     current_pos++;
                     state = READ_SIMPLE;
-                    TokenList.push_back(NOT_EQUAL);
+                    token_list.push_back(NOT_EQUAL);
                     current_token.clear();
                 } else
                     return INVALID_CHAR;  // error: invalid '!' in line N
