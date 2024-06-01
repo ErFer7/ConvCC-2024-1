@@ -2,9 +2,8 @@
 #include <string>
 #include <unordered_map>
 
-std::unordered_map TokenStrings;
-
-enum TokenParserStates;
+#include "data/error_codes.h"
+#include "data/symbol_table.h"
 
 int lexical_analyser(std::string source,
                      std::list<int> &token_list,
