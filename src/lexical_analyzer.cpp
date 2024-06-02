@@ -47,10 +47,10 @@ int lexical_analyser(std::string source,
                 } else if (next == '\"') {  // start of string
                     state = STRING_LITERAL;
                 } else if (next == '=' || next == '>' || next == '<') {
-                    state == COMPARE_ASSIGN;
+                    state = COMPARE_ASSIGN;
                     current_token += next;
                 } else if (next == '!') {
-                    state == DIFFERENT;
+                    state = DIFFERENT;
                 } else if (TokenStrings[std::string(1, next)] < ASSIGNMENT) {  // if token is 1-char and not < | > | =
                     token_list.push_back(TokenStrings[std::string(1, next)]);
                 } else {
