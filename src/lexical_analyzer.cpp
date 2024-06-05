@@ -16,43 +16,70 @@ std::unordered_map<std::string, Symbols> TokenStrings = {
     {"call", CALL},      {"null", NULL_CONST}};
 
 enum TokenParserStates {
-    READ_SIMPLE,       // skips whitespace,catches 1-char tokens,sends to other states
+    WHITE_SPACE,       // You have been living here for as long as you can remember
+    READ_SIMPLE,       // catches 1-char tokens,sends to other states
     MAYBE_IDENT,       // reads a word, then checks if it's a keyword
     NUMERAL,           // starts in a digit, may be int or float
     FLOAT_FRACTIONAL,  // fractional portion of float
     STRING_LITERAL,    // looks for string termination
-    COMPARE_ASSIGN,    // may find = or ==, < or <=, > or >=
+    ASSIGN_OR_EQUAL,   // may find = or ==
+    GREATER_OR_GE,     // may find > or >=
+    LESS_OR_LE,        // may find < or <=
     DIFFERENT          // must find = after !
+};
+
+int check_ident(unsigned int current_line,
+                std::string current_token,
+                std::unordered_map<std::string, std::list<unsigned int>> &symbol_table) {
+    // Checks if token is a keyword.
+    // If so, returns corresponding kw;
+    // Otherwise adds it to symbol table if not already in it, returning IDENT.
+    if (TokenStrings.find(current_token) != TokenStrings.end()) {
+        return TokenStrings[current_token];
+    } else if (symbol_table.find(current_token) != symbol_table.end()) {
+        symbol_table[current_token].push_back(current_line);
+    } else {
+        symbol_table[current_token] = {current_line};
+    }
+    return IDENT;
 };
 
 int lexical_analyser(std::string source,
                      std::list<int> &token_list,
                      std::unordered_map<std::string, std::list<unsigned int>> &symbol_table) {
-    unsigned int state = READ_SIMPLE, current_line = 1, current_pos = 0, size = source.size();
+    unsigned int state = WHITE_SPACE, current_line = 1, current_pos = 0, size = source.size();
     char next;
     std::string current_token;
     while (current_pos < size) {
         next = source[current_pos];
         switch (state) {
-            case READ_SIMPLE:
+            case WHITE_SPACE:
                 if (isspace(next)) {
                     if (next == '\n') current_line++;
                     current_pos++;
-                    break;
-                } else if (isalpha(next) || next == '_') {  // start of ident or keyword
+                } else {
+                    state = READ_SIMPLE;
+                }
+                break;
+            case READ_SIMPLE:
+                if (isalpha(next) || next == '_') {  // start of ident or keyword
                     state = MAYBE_IDENT;
                     current_token += next;
                 } else if (isdigit(next)) {  // start of number
                     state = NUMERAL;
                 } else if (next == '\"') {  // start of string
                     state = STRING_LITERAL;
-                } else if (next == '=' || next == '>' || next == '<') {
-                    state = COMPARE_ASSIGN;
-                    current_token += next;
+                } else if (next == '=') {
+                    state = ASSIGN_OR_EQUAL;
+                } else if (next == '>') {
+                    state = GREATER_OR_GE;
+                } else if (next == '<') {
+                    state = LESS_OR_LE;
                 } else if (next == '!') {
                     state = DIFFERENT;
                 } else if (TokenStrings[std::string(1, next)] < ASSIGNMENT) {  // if token is 1-char and not < | > | =
                     token_list.push_back(TokenStrings[std::string(1, next)]);
+                    state = WHITE_SPACE;
                 } else {
                     return INVALID_CHAR;  // error: invalid character in line N
                 }
@@ -63,16 +90,8 @@ int lexical_analyser(std::string source,
                     current_token += next;
                     current_pos++;
                 } else {
-                    state = READ_SIMPLE;
-                    if (TokenStrings.find(current_token) != TokenStrings.end()) {  // is keyword
-                        token_list.push_back(TokenStrings[current_token]);
-                    } else if (symbol_table.find(current_token) == symbol_table.end()) {  // not in table
-                        symbol_table[current_token] = {current_pos};
-                        token_list.push_back(IDENT);
-                    } else {  // already in table
-                        symbol_table[current_token].push_back(current_pos);
-                        token_list.push_back(IDENT);
-                    }
+                    state = WHITE_SPACE;
+                    token_list.push_back(check_ident(current_line, current_token, symbol_table));
                     current_token.clear();
                 }
                 break;
@@ -85,7 +104,7 @@ int lexical_analyser(std::string source,
                 } else if (isalpha(next) || next == '_') {
                     return INVALID_NUMBER_FORMAT;
                 } else {
-                    state = READ_SIMPLE;
+                    state = WHITE_SPACE;
                     token_list.push_back(INT_CONST);
                 }
                 break;
@@ -95,31 +114,51 @@ int lexical_analyser(std::string source,
                 } else if (isalpha(next) || next == '_') {
                     return INVALID_NUMBER_FORMAT;
                 } else {
-                    state = READ_SIMPLE;
+                    state = WHITE_SPACE;
                     token_list.push_back(FLOAT_CONST);
                 }
                 break;
             case STRING_LITERAL:  // You can't escape! (it doesnt escape chars)
                 if (next == '\"') {
-                    state == READ_SIMPLE;
+                    state == WHITE_SPACE;
                     token_list.push_back(STRING_CONST);
+                } else if (next == '\n') {  // no multiline strings
+                    return UNCLOSED_STRING;
                 }
                 current_pos++;
                 break;
-            case COMPARE_ASSIGN:
+            case ASSIGN_OR_EQUAL:
                 if (next == '=') {
-                    current_token += next;
+                    token_list.push_back(EQUAL);
                     current_pos++;
+                } else {
+                    token_list.push_back(ASSIGNMENT);
                 }
-                state = READ_SIMPLE;
-                token_list.push_back(TokenStrings[current_token]);
-                current_token.clear();
+                state = WHITE_SPACE;
+                break;
+            case GREATER_OR_GE:
+                if (next == '=') {
+                    token_list.push_back(GREATER_EQUAL);
+                    current_pos++;
+                } else {
+                    token_list.push_back(GREATER_THAN);
+                }
+                state = WHITE_SPACE;
+                break;
+            case LESS_OR_LE:
+                if (next == '=') {
+                    token_list.push_back(LESS_EQUAL);
+                    current_pos++;
+                } else {
+                    token_list.push_back(LESS_THAN);
+                }
+                state = WHITE_SPACE;
                 break;
             case DIFFERENT:
                 if (next == '=') {
                     current_token += next;
                     current_pos++;
-                    state = READ_SIMPLE;
+                    state = WHITE_SPACE;
                     token_list.push_back(NOT_EQUAL);
                     current_token.clear();
                 } else
