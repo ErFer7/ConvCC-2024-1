@@ -3,7 +3,9 @@
 #include <unordered_map>
 
 #include "data/error_codes.h"
+#include "data/grammar_symbols.h"
 #include "data/symbol_table.h"
+#include "data/token_list.h"
 
 std::unordered_map<std::string, Symbols> TokenStrings = {
     {"(", OPEN_P},       {")", CLOSE_P},      {"[", OPEN_SB},        {"]", CLOSE_SB},   {"{", OPEN_CB},
@@ -30,23 +32,19 @@ enum TokenParserStates {
 
 int check_ident(unsigned int current_line,
                 std::string current_token,
-                std::unordered_map<std::string, std::list<unsigned int>> &symbol_table) {
+                SymbolTable &symbol_table) {
     // Checks if token is a keyword.
     // If so, returns corresponding kw;
     // Otherwise adds it to symbol table if not already in it, returning IDENT.
-    if (TokenStrings.find(current_token) != TokenStrings.end()) {
+    if (TokenStrings.find(current_token) != TokenStrings.end())
         return TokenStrings[current_token];
-    } else if (symbol_table.find(current_token) != symbol_table.end()) {
-        symbol_table[current_token].push_back(current_line);
-    } else {
-        symbol_table[current_token] = {current_line};
-    }
+    symbol_table.add_instance(current_token,current_line);
     return IDENT;
 };
 
 int lexical_analyser(std::string source,
-                     std::list<int> &token_list,
-                     std::unordered_map<std::string, std::list<unsigned int>> &symbol_table) {
+                     TokenList &token_list,
+                     SymbolTable &symbol_table) {
     unsigned int state = WHITE_SPACE, current_line = 1, current_pos = 0, size = source.size();
     char next;
     std::string current_token;
@@ -67,6 +65,7 @@ int lexical_analyser(std::string source,
                     current_token += next;
                 } else if (isdigit(next)) {  // start of number
                     state = NUMERAL;
+                    current_token += next;
                 } else if (next == '\"') {  // start of string
                     state = STRING_LITERAL;
                 } else if (next == '=') {
@@ -91,40 +90,48 @@ int lexical_analyser(std::string source,
                     current_pos++;
                 } else {
                     state = WHITE_SPACE;
-                    token_list.push_back(check_ident(current_line, current_token, symbol_table));
+                    int result = check_ident(current_line, current_token, symbol_table);
+                    token_list.push_back(result,result==IDENT?current_token:"");
                     current_token.clear();
                 }
                 break;
             case NUMERAL:
                 if (isdigit(next)) {
+                    current_token += next;
                     current_pos++;
                 } else if (next == '.') {
                     state = FLOAT_FRACTIONAL;
+                    current_token += next;
                     current_pos++;
                 } else if (isalpha(next) || next == '_') {
                     return INVALID_NUMBER_FORMAT;
                 } else {
                     state = WHITE_SPACE;
-                    token_list.push_back(INT_CONST);
+                    token_list.push_back(INT_CONST,current_token);
+                    current_token.clear();
                 }
                 break;
             case FLOAT_FRACTIONAL:
                 if (isdigit(next)) {
+                    current_token += next;
                     current_pos++;
                 } else if (isalpha(next) || next == '_') {
                     return INVALID_NUMBER_FORMAT;
                 } else {
                     state = WHITE_SPACE;
-                    token_list.push_back(FLOAT_CONST);
+                    token_list.push_back(FLOAT_CONST,current_token);
+                    current_token.clear();
                 }
                 break;
             case STRING_LITERAL:  // You can't escape! (it doesnt escape chars)
                 if (next == '\"') {
                     state == WHITE_SPACE;
-                    token_list.push_back(STRING_CONST);
+                    token_list.push_back(STRING_CONST,current_token);
+                    current_token.clear();
                 } else if (next == '\n') {  // no multiline strings
                     return UNCLOSED_STRING;
                 }
+                current_token += next;
                 current_pos++;
                 break;
             case ASSIGN_OR_EQUAL:
