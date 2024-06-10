@@ -1,6 +1,7 @@
-#include "token_list.h"
+#include "data/token_list.h"
+#include "data/grammar_symbols.h"
 
-void TokenList::push_back(int type, std::string info = "") {
+void TokenList::push_back(Symbols type, std::string info) {
     struct Token token = {type,info};
     internal_token_list.push_back(token);
 };

@@ -1,4 +1,4 @@
-#include "symbol_table.h"
+#include "data/symbol_table.h"
 
 void SymbolTable::add_instance(std::string token,unsigned int line) {
     if (token_map.find(token) != token_map.end()) 

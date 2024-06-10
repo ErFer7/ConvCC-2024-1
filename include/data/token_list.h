@@ -1,5 +1,6 @@
 #include <list>
 #include <string>
+#include "data/grammar_symbols.h"
 #ifndef TOKEN_LIST_H
 #define TOKEN_LIST_H
 
@@ -10,7 +11,7 @@ struct Token {
 
 class TokenList {
     public:
-        void push_back(int type, std::string info = "");
+        void push_back(Symbols type, std::string info = "");
         Token pop_front();
         bool empty();
     private:

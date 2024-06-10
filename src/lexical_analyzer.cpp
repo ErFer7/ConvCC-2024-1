@@ -30,7 +30,7 @@ enum TokenParserStates {
     DIFFERENT          // must find = after !
 };
 
-int check_ident(unsigned int current_line,
+Symbols check_ident(unsigned int current_line,
                 std::string current_token,
                 SymbolTable &symbol_table) {
     // Checks if token is a keyword.
@@ -77,7 +77,8 @@ int lexical_analyser(std::string source,
                 } else if (next == '!') {
                     state = DIFFERENT;
                 } else if (TokenStrings[std::string(1, next)] < ASSIGNMENT) {  // if token is 1-char and not < | > | =
-                    token_list.push_back(TokenStrings[std::string(1, next)]);
+                    Symbols cur_symbol = TokenStrings[std::string(1, next)];
+                    token_list.push_back(cur_symbol);
                     state = WHITE_SPACE;
                 } else {
                     return INVALID_CHAR;  // error: invalid character in line N
@@ -90,7 +91,7 @@ int lexical_analyser(std::string source,
                     current_pos++;
                 } else {
                     state = WHITE_SPACE;
-                    int result = check_ident(current_line, current_token, symbol_table);
+                    Symbols result = check_ident(current_line, current_token, symbol_table);
                     token_list.push_back(result,result==IDENT?current_token:"");
                     current_token.clear();
                 }
