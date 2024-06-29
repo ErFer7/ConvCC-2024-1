@@ -7,7 +7,7 @@
 #include "data/symbol_table.h"
 #include "data/token_list.h"
 
-std::unordered_map<std::string, Symbols> TokenStrings = {
+std::unordered_map<std::string, Terminal> TokenStrings = {
     {"(", OPEN_P},       {")", CLOSE_P},      {"[", OPEN_SB},        {"]", CLOSE_SB},   {"{", OPEN_CB},
     {"}", CLOSE_CB},     {",", COMMA},        {";", SEMICOLON},      {"=", ASSIGNMENT}, {"<", LESS_THAN},
     {">", GREATER_THAN}, {"<=", LESS_EQUAL},  {">=", GREATER_EQUAL}, {"==", EQUAL},     {"!=", NOT_EQUAL},
@@ -30,7 +30,7 @@ enum TokenParserStates {
     DIFFERENT          // must find = after !
 };
 
-Symbols check_ident(unsigned int current_line,
+Terminal check_ident(unsigned int current_line,
                 std::string current_token,
                 SymbolTable &symbol_table) {
     // Checks if token is a keyword.
@@ -77,7 +77,7 @@ int lexical_analyser(std::string source,
                 } else if (next == '!') {
                     state = DIFFERENT;
                 } else if (TokenStrings[std::string(1, next)] < ASSIGNMENT) {  // if token is 1-char and not < | > | =
-                    Symbols cur_symbol = TokenStrings[std::string(1, next)];
+                    Terminal cur_symbol = TokenStrings[std::string(1, next)];
                     token_list.push_back(cur_symbol);
                     state = WHITE_SPACE;
                 } else {
@@ -91,7 +91,7 @@ int lexical_analyser(std::string source,
                     current_pos++;
                 } else {
                     state = WHITE_SPACE;
-                    Symbols result = check_ident(current_line, current_token, symbol_table);
+                    Terminal result = check_ident(current_line, current_token, symbol_table);
                     token_list.push_back(result,result==IDENT?current_token:"");
                     current_token.clear();
                 }

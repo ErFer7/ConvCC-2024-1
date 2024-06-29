@@ -1,8 +1,7 @@
 #ifndef GRAMMAR_SYMBOLS_H
 #define GRAMMAR_SYMBOLS_H
 
-enum Symbols {
-    /// TERMINALS ///
+enum Terminal {
     IDENT,
     OPEN_P,         // (
     CLOSE_P,        // )
@@ -44,7 +43,47 @@ enum Symbols {
     OR,
     NOT,
     CALL
-    /// TODO: INSERT NON-TERMINALS AFTER THIS POINT FOR SYNTAX ANALYSIS ///
+};
+
+enum NonTerminal {
+    PROGRAM,
+    FUNCLIST,
+    MOREFUNCS,
+    FUNCDEF,
+    PARAMLIST,
+    PARAMETER,
+    MAYBEPARAMS,
+    TYPE_DECL,  // type
+    STATEMENT,
+    VARDECL,
+    ARRAYSIZE,
+    ATRIBSTAT,
+    ATRIBEXPR,
+    FUNCCALL,
+    PARAMLISTCALL,
+    SOCALLMEMAYBE,
+    PRINTSTAT,
+    READSTAT,
+    RETURNSTAT,
+    IFSTAT,
+    MAYBEELSE,
+    FORSTAT,
+    STATELIST,
+    MAYBESTATELIST,
+    ALLOCEXPRESSION,
+    INDEXEXPRESSION,
+    EXPRESSION,
+    MAYBECOMPARE,
+    COMPARISON,
+    NUMEXPRESSION,
+    INDEXTERM,
+    TERM,
+    MULTUNARY,
+    MULDIV,
+    ADDSUB,
+    UNARYEXPR,
+    FACTOR,
+    LVALUE
 };
 
 #endif

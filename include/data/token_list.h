@@ -11,7 +11,7 @@ struct Token {
 
 class TokenList {
     public:
-        void push_back(Symbols type, std::string info = "");
+        void push_back(Terminal type, std::string info = "");
         Token pop_front();
         bool empty();
     private:
