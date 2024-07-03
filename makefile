@@ -12,7 +12,7 @@ OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 TEST_OBJ = $(filter-out $(OBJ_DIR)/main.o, $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o) $(TEST:$(TEST_DIR)/%.cpp=$(OBJ_DIR)/%.o))
 COMPILE_OBJ = $(CC) $(CFLAGS) -c $< -o $@ -I $(LIB_DIR)
 
-NAME = jegb
+NAME = 👍-compiler
 EXECUTABLE = $(BIN_DIR)/$(NAME)
 TEST_EXECUTABLE = $(BIN_DIR)/$(NAME)_test
 

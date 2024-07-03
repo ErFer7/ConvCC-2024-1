@@ -1,4 +1,4 @@
-// Compilador para a linguagem ConvCC-2024-1
+// Compilador para a linguagem Jegb
 
 #include <array>
 #include <fstream>
