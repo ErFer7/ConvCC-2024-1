@@ -33,3 +33,7 @@
 
 # Bin
 bin
+
+# Compile commands
+compile_commands.json
+.cache

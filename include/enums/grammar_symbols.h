@@ -1,5 +1,4 @@
-#ifndef GRAMMAR_SYMBOLS_H
-#define GRAMMAR_SYMBOLS_H
+#pragma once
 
 enum Terminal {
     IDENT,
@@ -85,5 +84,3 @@ enum NonTerminal {
     FACTOR,
     LVALUE
 };
-
-#endif
