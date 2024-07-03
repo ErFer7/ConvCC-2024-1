@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -g -Wall
+CFLAGS = -Wall -std=c++20 -O3 # -g -DDEBUG
 SRC_DIR = src
 TEST_DIR = test
 LIB_DIR = include
