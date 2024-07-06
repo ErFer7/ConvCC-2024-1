@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
 
     while (!token_list.empty()) {
         Token token = token_list.pop_front();
-        std::cout << "<" << token_to_name[token.type] << ", " << token.data << "> ";
+        std::cout << "<" << token_to_name[token.type] << ", " << token.line << ", " << token.column << ", " << token.data << "> ";
     }
 
     return 0;

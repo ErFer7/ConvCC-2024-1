@@ -2,8 +2,8 @@
 
 #include "enums/grammar_symbols.h"
 
-void TokenList::push_back(Terminal type, std::string data) {
-    struct Token token = {type, data};
+void TokenList::push_back(Terminal type, unsigned int line, unsigned int column, std::string data) {
+    struct Token token = {type, line, column, data};
     _internal_token_list.push_back(token);
 };
 

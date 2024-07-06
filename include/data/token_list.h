@@ -7,12 +7,14 @@
 
 struct Token {
     Terminal type;
+    unsigned int line;
+    unsigned int column;
     std::string data;
 };
 
 class TokenList {
    public:
-    void push_back(Terminal type, std::string data = "");
+    void push_back(Terminal type, unsigned int line, unsigned int column, std::string data = "");
     Token pop_front();
     bool empty();
 

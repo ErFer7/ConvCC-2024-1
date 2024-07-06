@@ -32,7 +32,7 @@ Terminal LexicalAnalyzer::check_identifier(unsigned int current_line,
 
 LexicalReturnCode LexicalAnalyzer::analyze(std::string source, TokenList &token_list, SymbolTable &symbol_table) {
     TokenParserStates state = WHITE_SPACE;
-    unsigned int current_line = 1, current_pos = 0, size = source.size();
+    unsigned int current_line = 1, current_column = 1, token_column = 1, current_pos = 0, size = source.size();
     char next;
     std::string current_token;
 
@@ -40,17 +40,19 @@ LexicalReturnCode LexicalAnalyzer::analyze(std::string source, TokenList &token_
         next = source[current_pos];
         switch (state) {
             case WHITE_SPACE:
-                if (!isspace(next)) {
+                if (isspace(next)) {
                     if (next == '\n') {
                         current_line++;
-                    } else {
-                        state = READ_SIMPLE;
-                        break;
+                        current_column = 0;
                     }
+                    current_pos++;
+                    current_column++;
+                } else {
+                    state = READ_SIMPLE;
                 }
-                current_pos++;
                 break;
             case READ_SIMPLE:
+                token_column = current_column;
                 if (isalpha(next) || next == '_') {  // start of ident or keyword
                     state = MAYBE_IDENT;
                     current_token += next;
@@ -70,21 +72,24 @@ LexicalReturnCode LexicalAnalyzer::analyze(std::string source, TokenList &token_
                     // if token is 1-char and not < | > | =
                 } else if (_TOKEN_STRINGS.at(std::string(1, next)) < ASSIGNMENT) {
                     Terminal current_symbol = _TOKEN_STRINGS.at(std::string(1, next));
-                    token_list.push_back(current_symbol);
+                    token_list.push_back(current_symbol, current_line, token_column);
                     state = WHITE_SPACE;
                 } else {
                     return INVALID_CHAR;  // error: invalid character in line N
                 }
                 current_pos++;
+                current_column++;
                 break;
             case MAYBE_IDENT:
                 if (isalnum(next) || next == '_') {
                     current_token += next;
                     current_pos++;
+                    current_column++;
                 } else {
                     state = WHITE_SPACE;
                     Terminal result = check_identifier(current_line, current_token, symbol_table);
-                    token_list.push_back(result, result == IDENT ? current_token : "");
+                    std::string data = result == IDENT ? current_token : "";
+                    token_list.push_back(result, current_line, token_column, data);
                     current_token.clear();
                 }
                 break;
@@ -92,15 +97,17 @@ LexicalReturnCode LexicalAnalyzer::analyze(std::string source, TokenList &token_
                 if (isdigit(next)) {
                     current_token += next;
                     current_pos++;
+                    current_column++;
                 } else if (next == '.') {
                     state = FLOAT_FRACTIONAL;
                     current_token += next;
                     current_pos++;
+                    current_column++;
                 } else if (isalpha(next) || next == '_') {
                     return INVALID_NUMBER_FORMAT;
                 } else {
                     state = WHITE_SPACE;
-                    token_list.push_back(INT_CONST, current_token);
+                    token_list.push_back(INT_CONST, current_line, token_column, current_token);
                     current_token.clear();
                 }
                 break;
@@ -108,18 +115,19 @@ LexicalReturnCode LexicalAnalyzer::analyze(std::string source, TokenList &token_
                 if (isdigit(next)) {
                     current_token += next;
                     current_pos++;
+                    current_column++;
                 } else if (isalpha(next) || next == '_') {
                     return INVALID_NUMBER_FORMAT;
                 } else {
                     state = WHITE_SPACE;
-                    token_list.push_back(FLOAT_CONST, current_token);
+                    token_list.push_back(FLOAT_CONST, current_line, token_column, current_token);
                     current_token.clear();
                 }
                 break;
             case STRING_LITERAL:  // You can't escape! (it doesnt escape chars)
                 if (next == '\"') {
                     state = WHITE_SPACE;
-                    token_list.push_back(STRING_CONST, current_token);
+                    token_list.push_back(STRING_CONST, current_line, token_column, current_token);
                     current_token.clear();
                 } else if (next == '\n') {  // no multiline strings
                     return UNCLOSED_STRING;
@@ -127,31 +135,35 @@ LexicalReturnCode LexicalAnalyzer::analyze(std::string source, TokenList &token_
                     current_token += next;
                 }
                 current_pos++;
+                current_column++;
                 break;
             case ASSIGN_OR_EQUAL:
                 if (next == '=') {
-                    token_list.push_back(EQUAL);
+                    token_list.push_back(EQUAL, current_line, token_column);
                     current_pos++;
+                    current_column++;
                 } else {
-                    token_list.push_back(ASSIGNMENT);
+                    token_list.push_back(ASSIGNMENT, current_line, token_column);
                 }
                 state = WHITE_SPACE;
                 break;
             case GREATER_OR_GE:
                 if (next == '=') {
-                    token_list.push_back(GREATER_EQUAL);
+                    token_list.push_back(GREATER_EQUAL, current_line, token_column);
                     current_pos++;
+                    current_column++;
                 } else {
-                    token_list.push_back(GREATER_THAN);
+                    token_list.push_back(GREATER_THAN, current_line, token_column);
                 }
                 state = WHITE_SPACE;
                 break;
             case LESS_OR_LE:
                 if (next == '=') {
-                    token_list.push_back(LESS_EQUAL);
+                    token_list.push_back(LESS_EQUAL, current_line, token_column);
                     current_pos++;
+                    current_column++;
                 } else {
-                    token_list.push_back(LESS_THAN);
+                    token_list.push_back(LESS_THAN, current_line, token_column);
                 }
                 state = WHITE_SPACE;
                 break;
@@ -159,8 +171,9 @@ LexicalReturnCode LexicalAnalyzer::analyze(std::string source, TokenList &token_
                 if (next == '=') {
                     current_token += next;
                     current_pos++;
+                    current_column++;
                     state = WHITE_SPACE;
-                    token_list.push_back(NOT_EQUAL);
+                    token_list.push_back(NOT_EQUAL, current_line, token_column);
                     current_token.clear();
                 } else
                     return INVALID_CHAR;  // error: invalid '!' in line N
