@@ -1,20 +1,23 @@
+#pragma once
+
 #include <list>
 #include <string>
-#include "data/grammar_symbols.h"
-#ifndef TOKEN_LIST_H
-#define TOKEN_LIST_H
+
+#include "enums/grammar_symbols.h"
 
 struct Token {
-    int type;
+    Terminal type;
+    unsigned int line;
+    unsigned int column;
     std::string data;
 };
 
 class TokenList {
-    public:
-        void push_back(Terminal type, std::string info = "");
-        Token pop_front();
-        bool empty();
-    private:
-        std::list<Token> internal_token_list;
+   public:
+    void push_back(Terminal type, unsigned int line, unsigned int column, std::string data = "");
+    Token pop_front();
+    bool empty();
+
+   private:
+    std::list<Token> _internal_token_list;
 };
-#endif

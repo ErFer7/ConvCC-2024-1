@@ -1,0 +1,119 @@
+def find_user_id (string name) {
+  string names [7];
+  names[0] = "Alice";
+  names[1] = "Bob";
+  names[2] = "Charlie";
+  names[3] = "Delilah";
+  names[4] = "Etho";
+  names[5] = "Fel";
+  names[6] = "Garnish";
+  int id;
+  for (id = 0; id < 7; id = id + 1) {
+    if (names[id] == name) {
+      return id;
+    }
+  }
+  return -1;
+}
+
+def user_salt (int id) {
+  string salts [7];
+  salts[0] = "23";
+  salts[1] = "01";
+  salts[2] = "75";
+  salts[3] = "29";
+  salts[4] = "30";
+  salts[5] = "87";
+  salts[6] = "60";
+  return salts[id];
+}
+
+def match_password (int id, string s_password) {
+  string passwords [7];
+  passwords[0] = "23never";
+  passwords[1] = "01store";
+  passwords[2] = "75pass";
+  passwords[3] = "29words";
+  passwords[4] = "30as";
+  passwords[5] = "87plain";
+  passwords[6] = "60text";
+  if (passwords[id] == s_password) {
+    return 1;
+  }
+  else {
+    return 0;
+  }
+}
+
+def personal_power (int id) {
+  string power [7];
+  power[0] = "Stone";
+  power[1] = "Star";
+  power[2] = "Kiss";
+  power[3] = "Diver";
+  power[4] = "Fighter";
+  power[5] = "Weather";
+  power[6] = "House";
+  return power[id];
+}
+
+def secret_dataset (int id) {
+  string secret [7];
+  secret[0] = "Sneezy";
+  secret[1] = "Phylum";
+  secret[2] = "Europe";
+  secret[3] = "Sloth";
+  secret[4] = "Guacamole";
+  secret[5] = "Data Link";
+  secret[6] = "Colossus of Rhodes";
+  return power[id];
+}
+
+def main (int _) {
+  print "Welcome to the system, insert username: ";
+  string name;
+  read name;
+
+  int id;
+  id = call find_user_id(name);
+  if (id == -1) {
+    print "User not found.";
+    return 1;
+  }
+
+  print "Insert password: ";
+  string password;
+  read password;
+  string salt;
+  salt = call user_salt(id);
+  password = salt + password
+
+  int auth;
+  auth = call match_password(id,password);
+  if (auth == 0) {
+    print "Authentication failed.";
+    return 2;
+  }
+
+  print "Successfully logged in. Type 0 to see your power, 1 to see your secret mark or any other number to skip.";
+  int check;
+  read check;
+
+  if (check == 0) {
+    string power;
+    power = call personal_power(id);
+    print "Your power is " + power + ".";
+  } else {
+    if (check == 1) {
+      string mark;
+      mark = call secret_dataset(id);
+      print "Your mark is " + mark + ".";
+    }
+  }
+
+  print "Goodbye.";
+  return 0;
+}
+
+int result;
+result = main(0);

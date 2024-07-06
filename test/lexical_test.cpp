@@ -1,6 +1,6 @@
+#include <array>
 #include <fstream>
 #include <iostream>
-#include <array>
 #include <sstream>
 #include <string>
 
@@ -8,7 +8,7 @@
 #include "data/token_list.h"
 #include "lexical_analyzer.h"
 
-std::array<std::string,41> token_to_name = {
+std::array<std::string, 41> token_to_name = {
     "ident", "(",      ")",     "[",   "]",    "{",   "}",         ",",           ";",
     "*",     "/",      "%",     "+",   "-",    "=",   "<",         ">",           "<=",
     ">=",    "==",     "!=",    "def", "new",  "int", "float",     "string",      "print",
@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
     TokenList token_list = TokenList();
     SymbolTable symbol_table = SymbolTable();
 
-    int result = lexical_analyser(sourcestring, token_list, symbol_table);
+    int result = LexicalAnalyzer::analyze(sourcestring, token_list, symbol_table);
 
     printf("%s\n", sourcestring.c_str());
     while (!token_list.empty()) {

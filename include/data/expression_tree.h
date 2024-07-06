@@ -1,11 +1,10 @@
-#include <string>
+#pragma once
 
-#ifndef EXPRESSION_TREE_H
-#define EXPRESSION_TREE_H
+#include <string>
 
 class Node {
     bool terminal;
-    int type; // may refer to enum Terminal or enum NonTerminal
+    int type;  // may refer to enum Terminal or enum NonTerminal
     Node **children;
     std::string data;
 
@@ -13,5 +12,3 @@ class Node {
     void add_child(Node child);
     void add_child(int child);
 };
-
-#endif

@@ -7,3 +7,4 @@ ExperimentalAutoDetectBinPacking: false
 AllowAllParametersOfDeclarationOnNextLine: false
 DerivePointerAlignment: false
 PointerAlignment: Right
+AllowShortIfStatementsOnASingleLine: Never
