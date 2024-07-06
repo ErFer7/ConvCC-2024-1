@@ -11,4 +11,5 @@ class SymbolTable {
 
    private:
     std::unordered_map<std::string, std::list<unsigned int>> token_map;
+    // add value as attribute
 };
