@@ -70,12 +70,16 @@ LexicalReturnCode LexicalAnalyzer::analyze(std::string source, TokenList &token_
                 } else if (next == '!') {
                     state = DIFFERENT;
                     // if token is 1-char and not < | > | =
-                } else if (_TOKEN_STRINGS.at(std::string(1, next)) < ASSIGNMENT) {
-                    Terminal current_symbol = _TOKEN_STRINGS.at(std::string(1, next));
-                    token_list.push_back(current_symbol, current_line, token_column);
-                    state = WHITE_SPACE;
                 } else {
-                    return INVALID_CHAR;  // error: invalid character in line N
+                    std::string key = std::string(1, next);
+
+                    if (_TOKEN_STRINGS.find(key) != _TOKEN_STRINGS.end() && _TOKEN_STRINGS.at(key) < ASSIGNMENT) {
+                        Terminal current_symbol = _TOKEN_STRINGS.at(key);
+                        token_list.push_back(current_symbol, current_line, token_column);
+                        state = WHITE_SPACE;
+                    } else {
+                        return INVALID_CHAR;  // error: invalid character in line N
+                    }
                 }
                 current_pos++;
                 current_column++;
