@@ -17,7 +17,7 @@ try:
 except IOError:
     sys.exit()
 
-return_code, char, tokens = LexicalAnalyzer.analyze(source)
+return_code, char, tokens, symbol_table = LexicalAnalyzer.analyze(source)
 
 print(f'Status: {return_code}, {char}')
 print('Token list contents: ')
@@ -25,3 +25,6 @@ print('Token list contents: ')
 while len(tokens) > 0:
     token = tokens.pop(0)
     print(f'<{token.type_.value}, {token.line}, {token.column}, {token.value}> ', end='')
+
+print('\n\n')
+print(symbol_table._table)

@@ -6,6 +6,7 @@ from enum import Enum
 
 from data.token import Token
 from data.grammar import Terminal, STRING_TO_TERMINAL, ONE_CHAR_DEFINITIVE_TERMINALS
+from data.symbol_table import SymbolTable
 
 
 class LexicalAnalyzerStates(Enum):
@@ -42,11 +43,12 @@ class LexicalAnalyzer:
     """
 
     @staticmethod
-    def analyze(source: str) -> tuple[LexicalReturnStatus, str, list[Token]]:
+    def analyze(source: str) -> tuple[LexicalReturnStatus, str, list[Token], SymbolTable]:
         """
         Analisa o código fonte e retorna a lista de tokens.
         """
 
+        symbol_table = SymbolTable()
         token_list: list[Token] = []
         state = LexicalAnalyzerStates.WHITE_SPACE
         line = 1
@@ -93,7 +95,7 @@ class LexicalAnalyzer:
                             state = LexicalAnalyzerStates.WHITE_SPACE
                             token_list.append(Token(STRING_TO_TERMINAL[next_], line, token_column))
                         else:
-                            return LexicalReturnStatus.INVALID_CHAR, next_, token_list
+                            return LexicalReturnStatus.INVALID_CHAR, next_, token_list, symbol_table
 
                     index += 1
                     column += 1
@@ -109,8 +111,7 @@ class LexicalAnalyzer:
                             token_list.append(Token(STRING_TO_TERMINAL[token], line, token_column))
                         else:
                             token_list.append(Token(Terminal.IDENT, line, token_column, token))
-                            # TODO: Add to the symbol table
-
+                            symbol_table.add_symbol_instance(token, line, token_column)
                         token = ''
                 case LexicalAnalyzerStates.NUMERAL:
                     if next_.isdigit():
@@ -123,7 +124,7 @@ class LexicalAnalyzer:
                         index += 1
                         column += 1
                     elif next_.isalpha() or next_ == '_':
-                        return LexicalReturnStatus.INVALID_NUMBER_FORMAT, next_, token_list
+                        return LexicalReturnStatus.INVALID_NUMBER_FORMAT, next_, token_list, symbol_table
                     else:
                         state = LexicalAnalyzerStates.WHITE_SPACE
                         token_list.append(Token(Terminal.INT_CONST, line, token_column, token))
@@ -134,7 +135,7 @@ class LexicalAnalyzer:
                         index += 1
                         column += 1
                     elif next_.isalpha() or next_ == '_':
-                        return LexicalReturnStatus.INVALID_NUMBER_FORMAT, next_, token_list
+                        return LexicalReturnStatus.INVALID_NUMBER_FORMAT, next_, token_list, symbol_table
                     else:
                         state = LexicalAnalyzerStates.WHITE_SPACE
                         token_list.append(Token(Terminal.FLOAT_CONST, line, token_column, token))
@@ -145,7 +146,7 @@ class LexicalAnalyzer:
                         token_list.append(Token(Terminal.STRING_CONST, line, token_column, token))
                         token = ''
                     elif next_ == '\n':
-                        return LexicalReturnStatus.UNCLOSED_STRING, next_, token_list
+                        return LexicalReturnStatus.UNCLOSED_STRING, next_, token_list, symbol_table
                     else:
                         token += next_
 
@@ -185,9 +186,9 @@ class LexicalAnalyzer:
                         index += 1
                         column += 1
                     else:
-                        return LexicalReturnStatus.INVALID_CHAR, next_, token_list
+                        return LexicalReturnStatus.INVALID_CHAR, next_, token_list, symbol_table
                     token = ''
                 case _:
                     print('\n\nWhat\n\n')
 
-        return LexicalReturnStatus.OK, '', token_list
+        return LexicalReturnStatus.OK, '', token_list, symbol_table
