@@ -50,7 +50,16 @@ class SDTProcessor:
                 if len(stack) == 0:
                     return SyntaxReturnStatus.OK, current_token
                 else:
-                    return SyntaxReturnStatus.STACK_NOT_EMPTY, current_token
+                    while stack:
+                        status = SyntaxAnalyzer.analyze(
+                        "",
+                        symbol_table,
+                        stack,
+                        current_index_token,
+                    )
+                        if status != SyntaxReturnStatus.OK:
+                            return SyntaxReturnStatus.STACK_NOT_EMPTY, current_token
+                    return SyntaxReturnStatus.OK, current_token
 
             if len(stack) == 0:
                 return SyntaxReturnStatus.ENTRY_NOT_CONSUMED, current_token

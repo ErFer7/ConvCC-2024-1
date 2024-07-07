@@ -35,6 +35,17 @@ class SyntaxAnalyzer:
         """
         Analisa a lista de tokens.
         """
+        if current_token == "":
+            # verificar se o fundo de pilha está na tabela
+            if "" in DerivationTable[stack[0]]:
+                production_rules = ProductionList[
+                    DerivationTable[stack[0]][""]
+                ].tail
+                # se existe, adicionar as regras de produção na pilha
+                stack = production_rules + stack
+                return SyntaxReturnStatus.OK
+            # se não existe a entrada na tabela de símbolos, retornar erro
+            return SyntaxReturnStatus.ENTRY_DOES_NOT_EXIST
         if isinstance(stack[0], Terminal):
             if current_token.type_ == stack[0]:
                 current_id_token += 1
@@ -43,17 +54,6 @@ class SyntaxAnalyzer:
         if isinstance(stack[0], NonTerminalType):
             # verificar se a entrada existe na tabela de símbolos
             if current_token.type_ in DerivationTable[stack[0]]:
-                production_rules = ProductionList[
-                    DerivationTable[stack[0]][current_token.type_]
-                ].tail
-                # se existe, adicionar as regras de produção na pilha
-                stack = production_rules + stack
-                return SyntaxReturnStatus.OK
-            # se não existe a entrada na tabela de símbolos, retornar erro
-            return SyntaxReturnStatus.ENTRY_DOES_NOT_EXIST
-        if not stack:  # TODO : fix
-            # verificar se a entrada existe na tabela de símbolos
-            if current_token.type_ in DerivationTable[""]:
                 production_rules = ProductionList[
                     DerivationTable[stack[0]][current_token.type_]
                 ].tail
