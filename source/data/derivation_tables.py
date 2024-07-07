@@ -1,6 +1,5 @@
 from data.grammar import NonTerminalType as N, Terminal as T
 
-
 class Derivation:
     def __init__(self, head: N, tail: list):
         self.head = head

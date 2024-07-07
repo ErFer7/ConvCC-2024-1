@@ -1,5 +1,5 @@
 """
-
+Analisador Semântica
 """
 
 from data.token import Token
@@ -8,36 +8,40 @@ from data.grammar import NonTerminalType as N, Terminal as T
 from enum import Enum
 
 
-class DerivationNode:
-    _symbol: N | T
-    _children: list['DerivationNode']
-    
-
-    def __init__(self, symbol):
-        self.symbol = symbol
-        self.children = []
-        self.no = None
-        self.parcial= None
-
-    def symbol(self):
-        return self.symbol
-    def children(self):
-        return self.children
-    def add_children(self,node):
-        self.children.append(node)
-
 class ArithmeticNode:
     _left: 'ArithmeticNode'
     _right: 'ArithmeticNode'
-    
     def __init__(self, value, left = None, right = None) -> None:
         self.value = value
         self.left = left
         self.right = right
 
+
 class ArithmeticTree:
     def __init__(self, root) -> None:
         self.root = root
+
+
+class DerivationNode:
+    _symbol: N | T
+    _children: list['DerivationNode']
+    _no: ArithmeticNode
+    _parcial: ArithmeticNode
+
+    def __init__(self, symbol):
+        self.symbol_ = symbol
+        self.children_ = []
+        self.no = None
+        self.parcial= None
+
+    def symbol(self):
+        return self.symbol_
+
+    def children(self):
+        return self.children_
+
+    def add_children(self,node):
+        self.children_.append(node)
 
 class SemanticAction:
     """
