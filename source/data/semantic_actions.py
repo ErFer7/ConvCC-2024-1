@@ -12,6 +12,9 @@ class ArithmeticNode:
         self.left = left
         self.right = right
 
+    def __repr__(self) -> str:
+        return f"{self.value}" + self.left + self.right
+
 
 class ArithmeticTree:
     def __init__(self, root) -> None:

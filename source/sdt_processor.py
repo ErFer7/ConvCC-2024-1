@@ -5,6 +5,7 @@ Processador de SDT.
 from data.token import Token
 from data.symbol_table import SymbolTable
 from data.grammar import NonTerminalType
+from data.semantic_actions import DerivationNode
 from syntax_analyzer import SyntaxAnalyzer, SyntaxReturnStatus
 from semantic_analyzer import SemanticAction
 
@@ -13,6 +14,8 @@ class SDTProcessor:
     """
     Processador de SDT.
     """
+
+    derivation_root = None
 
     def __init__(self) -> None:
         pass
@@ -29,13 +32,17 @@ class SDTProcessor:
         current_stack_element = (
             NonTerminalType.PROGRAM
         )  # Inicializa a stack com o símbolo inicial da gramática
+
+        current_derivation_node = DerivationNode(current_stack_element)
+        derivation_root = current_derivation_node
+
         current_token_index = 0
         current_token = tokens[current_token_index]
 
         while True:
             if isinstance(current_stack_element, SemanticAction):
                 current_stack_element.execute(
-                    tokens[current_token_index], symbol_table
+                    current_derivation_node
                 )  # TODO: change parameters after
             else:
                 status, token_index_increment = SyntaxAnalyzer.analyze(
@@ -78,3 +85,7 @@ class SDTProcessor:
 
             current_token = tokens[current_token_index]
             current_stack_element = stack.pop()
+
+            # new_node = DerivationNode(current_stack_element)
+            # current_derivation_node.add_children(new_node)
+            # current_derivation_node = new_node
