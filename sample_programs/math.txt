@@ -27,7 +27,7 @@ def factorial (int n) {
   f = 1;
   int i;
   for (i = 0; i < n; i = i + 1) {
-    f = f * (i + 1)
+    f = f * (i + 1);
   }
   return f;
 }
@@ -47,7 +47,8 @@ def itof (int n) {
   int pow;
   int two_to_pow;
   float two_to_pow_f;
-  float result = 0.0
+  float result;
+  result = 0.0;
   if (n > 0) {
     two_to_pow = 1;
     two_to_pow_f = 1.0;
@@ -133,35 +134,48 @@ def normal3 (float x, float y, float z) {
 }
 
 def main(int _) {
-print “testing functions”;
+print "testing functions";
 
 int fib;
-fib = call fibonacci(7);
+int seven;
+seven = 7;
+fib = call fibonacci(seven);
 print fib;
 
 int fact;
-fact = call factorial(6);
+int six;
+six = 6;
+fact = call factorial(six);
 print fact;
 
 float absolute;
-absolute = call abs(-1.25);
+float minus_one_and_a_twenty_five;
+minus_one_and_a_twentyfive = -1.25;
+absolute = call abs(minus_one_and_a_twenty_five);
 print absolute;
 
 float dumb;
-dumb = call itof(49);
+int forty_nine;
+forty_nine = 49;
+dumb = call itof(forty_nine);
 dumb = call sqrt(dumb);
 print dumb;
 
 float normal_two[2];
-normal_two = call normal2(2.0,2.0);
+float two;
+two = 2.0;
+normal_two = call normal2(two, two);
 print normal_two[0];
 print normal_two[1];
 
 float normal_three[3];
-normal_three = call normale(3.0,4.0,5.0);
+three = 3.0;
+four = 4.0;
+five = 5.0;
+normal_three = call normale(three, four, five);
 print normal_three[0];
 print normal_three[1];
 print normal_three[2];
 
-print “complete”;
+print "complete";
 }

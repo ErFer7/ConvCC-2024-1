@@ -30,7 +30,7 @@ class SyntaxAnalyzer:
 
         if current_token == '':
             # verificar se o fundo de pilha está na tabela
-            if "" in DerivationTable[current_stack_element]:
+            if not isinstance(current_stack_element, Terminal) and '' in DerivationTable[current_stack_element]:
                 production_rules = ProductionList[
                     DerivationTable[current_stack_element][""]
                 ].tail
