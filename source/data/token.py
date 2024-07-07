@@ -20,3 +20,6 @@ class Token():
         self.line = line
         self.column = column
         self.value = value
+
+    def __repr__(self) -> str:
+        return f'<{self.type_.value}, {self.line}, {self.column}, {self.value}>'

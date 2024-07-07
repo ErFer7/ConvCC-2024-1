@@ -40,6 +40,9 @@ class SymbolTable():
     def __init__(self) -> None:
         self._table = {}
 
+    def __repr__(self) -> str:
+        return f'{self._table}'
+
     def add_symbol_instance(self, name: str, line: int, column: int) -> None:
         """
         Adiciona um símbolo à tabela.

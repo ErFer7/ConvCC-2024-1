@@ -24,7 +24,7 @@ print('Token list contents: ')
 
 while len(tokens) > 0:
     token = tokens.pop(0)
-    print(f'<{token.type_.value}, {token.line}, {token.column}, {token.value}> ', end='')
+    print(f'{token} ', end='')
 
 print('\n\n')
-print(symbol_table._table)
+print(symbol_table)
