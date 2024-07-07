@@ -11,17 +11,13 @@ class Token:
     """
 
     type_: Terminal
-    line: int
-    column: int
+    position: tuple[int, int]
     value: str
 
-    def __init__(
-        self, type_: Terminal, line: int, column: int, value: str = ""
-    ) -> None:
+    def __init__(self, type_: Terminal, line: int, column: int, value: str = '') -> None:
         self.type_ = type_
-        self.line = line
-        self.column = column
+        self.position = (line, column)
         self.value = value
 
     def __repr__(self) -> str:
-        return f"<{self.type_.value}, {self.line}, {self.column}, {self.value}>"
+        return f'<{self.type_.value}, {self.position}, {self.value}>'
