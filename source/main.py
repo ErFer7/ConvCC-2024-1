@@ -6,25 +6,49 @@ import sys
 from sys import argv
 
 from lexical_analyzer import LexicalAnalyzer
+from sdt_processor import SDTProcessor
+from return_status import LexicalReturnStatus, ReturnStatus
 
-if len(argv) < 2:
-    print('Usage: lexical_test "source_file.txt"')
-    sys.exit()
+def main() -> None:
+    # if len(argv) < 2:
+    #     print('Usage: lexical_test "source_file.txt"')
+    #     sys.exit()
 
-try:
-    with open(argv[1], 'r', encoding='utf-8') as source_file:
-        source = source_file.read()
-except IOError:
-    sys.exit()
+    # try:
+    #     with open(argv[1], 'r', encoding='utf-8') as source_file:
+    #         source = source_file.read()
+    # except IOError:
+    #     sys.exit()
+    try:
+        with open('sample_programs/hello_world.txt', 'r', encoding='utf-8') as source_file:
+            source = source_file.read()
+    except IOError:
+        sys.exit()
 
-return_code, char, tokens, symbol_table = LexicalAnalyzer.analyze(source)
+    return_code, pos, tokens, symbol_table = LexicalAnalyzer.analyze(source)
 
-print(f'Status: {return_code}, {char}')
-print('Token list contents: ')
+    status = ReturnStatus(return_code, None, pos)
 
-while len(tokens) > 0:
-    token = tokens.pop(0)
-    print(f'{token} ', end='')
+    if status.has_errors():
+        print(status.get_message())
+        return
 
-print('\n\n')
-print(symbol_table)
+    print('Token list contents: ')
+
+    for token in tokens:
+        print(f'{token} ', end='')
+
+    print('\n\n')
+    print(symbol_table)
+
+    return_code, token = SDTProcessor.process(tokens, symbol_table)
+    print('\n')
+
+    status = ReturnStatus(return_code, token)
+
+    print(status.get_message())
+    if status.has_errors():
+        return
+
+if __name__ == "__main__":
+    main()
