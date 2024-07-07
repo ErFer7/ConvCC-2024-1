@@ -37,6 +37,7 @@ class LexicalAnalyzer:
         Analisa o código fonte e retorna a lista de tokens.
         """
 
+        source += ' '
         symbol_table = SymbolTable()
         token_list: list[Token] = []
         state = LexicalAnalyzerStates.WHITE_SPACE

@@ -56,6 +56,8 @@ class SDTProcessor:
                     return SyntaxReturnStatus.OK, current_token
 
                 while stack:
+                    current_stack_element = stack.pop()
+
                     status, token_index_increment = SyntaxAnalyzer.analyze(
                         "",
                         symbol_table,

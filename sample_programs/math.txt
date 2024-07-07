@@ -49,6 +49,8 @@ def itof (int n) {
   float two_to_pow_f;
   float result;
   result = 0.0;
+  float result;
+  result = 0.0;
   if (n > 0) {
 	two_to_pow = 1;
 	two_to_pow_f = 1.0;
@@ -179,6 +181,7 @@ print normal_three[0];
 print normal_three[1];
 print normal_three[2];
 
+print "complete";
 print "complete";
 }
 

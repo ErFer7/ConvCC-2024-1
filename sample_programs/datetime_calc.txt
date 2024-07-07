@@ -14,7 +14,7 @@ def wasted_time (int how_long) {
   result = 0;
   if (how_long % 3) {
     for (i = 0; i < how_long; i = i + 3) {
-      result = result + 4 * i
+      result = result + 4 * i;
     }
   }
   if (how_long) {
@@ -66,20 +66,20 @@ def difference_date (int year1, int month1, int day1, int year2, int month2, int
   int totalday2;
   int is_leap1;
   int is_leap2;
-  is_leap1 = leap_yeap(year1);
-  is_leap2 = leap_yeap(year2);
-  totalday1 = which_day(day1,month1,is_leap1);
-  totalday2 = which_day(day2,month2,is_leap2);
+  is_leap1 = call leap_yeap(year1);
+  is_leap2 = call leap_yeap(year2);
+  totalday1 = call which_day(day1,month1,is_leap1);
+  totalday2 = call which_day(day2,month2,is_leap2);
   int d_diff;
   diff = 0;
   int y;
   int leap_e;
   for (y = year1; y < year2; y = y + 1) {
-    leap_e = leap_yeap(y);
+    leap_e = call leap_yeap(y);
     d_diff = d_diff + 365 + leap_e;
   }
   if (totalday1 > totalday2) {
-    leap_e = leap_yeap(y);
+    leap_e = call leap_yeap(y);
     d_diff = d_diff - 365 + leap_e;
   }
   d_diff = d_diff + totalday2 - totalday1;
