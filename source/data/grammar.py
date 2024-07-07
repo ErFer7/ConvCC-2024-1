@@ -96,6 +96,7 @@ class NonTerminalType(Enum):
     UNARYEXPR = "UNARYEXPR"
     FACTOR = "FACTOR"
     LVALUE = "LVALUE"
+    TYPE = "TYPE"
 
 
 STRING_TO_TERMINAL = {member.value: member for member in Terminal}
