@@ -10,17 +10,12 @@ from sdt_processor import SDTProcessor
 from return_status import LexicalReturnStatus, ReturnStatus
 
 def main() -> None:
-    # if len(argv) < 2:
-    #     print('Usage: lexical_test "source_file.txt"')
-    #     sys.exit()
+    if len(argv) < 2:
+        print('Usage: lexical_test "source_file.txt"')
+        sys.exit()
 
-    # try:
-    #     with open(argv[1], 'r', encoding='utf-8') as source_file:
-    #         source = source_file.read()
-    # except IOError:
-    #     sys.exit()
     try:
-        with open('sample_programs/hello_world.txt', 'r', encoding='utf-8') as source_file:
+        with open(argv[1], 'r', encoding='utf-8') as source_file:
             source = source_file.read()
     except IOError:
         sys.exit()
