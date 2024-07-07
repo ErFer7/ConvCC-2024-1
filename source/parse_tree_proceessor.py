@@ -31,24 +31,24 @@ class Node:
             case N.EXPRESSION:
                 if self.children[1].no:
                     self.no= self.children[1].no
-                if self.no:
+                if self.children[0].no:
                     self.children[1].parcial=self.children[0].no
 
             case N.MAYBECOMPARE:
                 if len(self.lchildren())==0:
-                    self.no= self.parcial
+                    self.no = self.parcial
                 else:
                     if self.children[0].no:
-                        self.no== self.children[0].no
+                        self.no = self.children[0].no
                     if self.parcial:
                         self.children[1].parcial=self.parcial
             case N.COMPARISON:
                 self.no= Node(self.lchildren()[0].nodemain())
             case N.NUMEXPRESSION:
                 if self.children[0].no:
-                    self.children[1].no= self.children[0].no
+                    self.children[1].parcial= self.children[0].no
                 if self.children[1].no:
-                    self.no== self.children[0].no
+                    self.no=self.children[1].no
             case N.INDEXTERM:
                 if len(self.lchildren())==0:
                     self.no= self.parcial
@@ -57,12 +57,14 @@ class Node:
                     #    self.children[0].val1= self.children[3].no
                     #if self.children[1].no:
                     #    self.children[0].val2=self.parcial
-                    if self.children[0].no:
-                        self.children[2].parcial=self.children[0].no
-                    if self.children[2].no:
-                        self.no=self.children[2].no      
-            case N.TERM:
+                    if self.parcial and self.children[0].no and self.children[2].no:
+                        self.no= Node(self.children[0].nodemain())
+                        self.no.nodechildren(self.parcial)
+                        self.no.nodechildren(self.children[2].no)
                     if self.children[1].no:
+                        self.children[2].parcial=self.children[1].no
+            case N.TERM:
+                    if self.children[0].no:
                         self.children[1].parcial=self.children[0].no
                     if self.children[1].no:
                         self.no=self.children[1].no   
@@ -70,10 +72,13 @@ class Node:
                 if len(self.lchildren())==0:
                     self.no= self.parcial
                 else:
-                    if self.children[0].no:
-                        self.children[2].parcial= self.children[0].no
-                    if self.children[2].no:
-                        self.no=self.children[2].no    
+                    if self.parcial and self.children[0].no and self.children[2].no:
+                        self.no= Node(self.children[0].nodemain())
+                        self.no.nodechildren(self.parcial)
+                        self.no.nodechildren(self.children[2].no)
+                    if self.children[1].no:
+                        self.children[2].parcial=self.children[1].no
+                        
             case N.MULDIV:
                 self.no= Node(self.lchildren()[0].nodemain())
             case N.ADDSUB:
@@ -94,7 +99,8 @@ class Node:
                 if len(self.lchildren())>1:
                     if self.children[1].nodemain()==N.EXPRESSION and self.children[1].no:
                         self.no= self.children[1].no
-                self.parcial=Node(self.lchildren()[0].nodemain())
+                else:
+                    self.parcial=Node(self.lchildren()[0].nodemain())
         if (self.no):
             print(self.nodemain())
 
@@ -145,12 +151,13 @@ def generate_tree():
     source_node = Node(N.EXPRESSION)
     node_analysis(source_node)
     print_tree(source_node, 0)
-    for i in range (0,300):
+    for i in range (0,50):
         source_node.update_values()
+    print('---------------------')
     print_tree(source_node.no, 0)
     print('------------')
 
-    print(source_node.no)
+    print(source_node.no.nodemain())
 
 generate_tree()
 
