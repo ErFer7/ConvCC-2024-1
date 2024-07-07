@@ -18,26 +18,32 @@ class SDTProcessor:
         pass
 
     @staticmethod
-    def process(tokens: list[Token], symbol_table: SymbolTable) -> tuple[SyntaxReturnStatus, Token]:
+    def process(
+        tokens: list[Token], symbol_table: SymbolTable
+    ) -> tuple[SyntaxReturnStatus, Token]:
         """
         Processa a lista de tokens.
         """
 
         stack = []
-        current_stack_element = NonTerminalType.PROGRAM  # Inicializa a stack com o símbolo inicial da gramática
+        current_stack_element = (
+            NonTerminalType.PROGRAM
+        )  # Inicializa a stack com o símbolo inicial da gramática
         current_token_index = 0
         current_token = tokens[current_token_index]
 
         while True:
             if isinstance(current_stack_element, SemanticAction):
-                current_stack_element.execute(tokens[current_token_index], symbol_table)  # TODO: change parameters after
+                current_stack_element.execute(
+                    tokens[current_token_index], symbol_table
+                )  # TODO: change parameters after
             else:
                 status, token_index_increment = SyntaxAnalyzer.analyze(
                     tokens[current_token_index],
                     symbol_table,
                     stack,
                     current_token_index,
-                    current_stack_element
+                    current_stack_element,
                 )
 
                 current_token_index += token_index_increment
@@ -51,11 +57,11 @@ class SDTProcessor:
 
                 while stack:
                     status, token_index_increment = SyntaxAnalyzer.analyze(
-                        '',
+                        "",
                         symbol_table,
                         stack,
                         current_token_index,
-                        current_stack_element
+                        current_stack_element,
                     )
 
                     current_token_index += token_index_increment

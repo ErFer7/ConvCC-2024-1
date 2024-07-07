@@ -21,7 +21,7 @@ def wasted_time (int how_long) {
     for (i = 0; i < how_long; i = i + 5) {
       result = result + 31;
     }
-  } 
+  }
   return result;
 }
 
@@ -87,27 +87,27 @@ def difference_date (int year1, int month1, int day1, int year2, int month2, int
 }
 
 def main(int _) {
-print “Calculadora de distancia entre dois dias”;
-print “Insira o ano da primeira data”;
+print "Calculadora de distancia entre dois dias";
+print "Insira o ano da primeira data";
 int year1;
 read year1;
-print “Insira o mes da primeira data”;
+print "Insira o mes da primeira data";
 int month1;
 read month1;
-print “Insira o dia da primeira data”;
+print "Insira o dia da primeira data";
 int day1;
 read day1;
-print “Insira o ano da segunda data”;
+print "Insira o ano da segunda data";
 int year2;
 read year2;
-print “Insira o mes da segunda data”;
+print "Insira o mes da segunda data";
 int month2;
 read month2;
-print “Insira o dia da segunda data”;
+print "Insira o dia da segunda data";
 int day2;
 read day2;
 int difference;
 difference = call difference_date(year1,month1,day1,year2,month2,day2);
-print “A diferenca das datas em dias eh de:”;
+print "A diferenca das datas em dias eh de:";
 print difference;
 }

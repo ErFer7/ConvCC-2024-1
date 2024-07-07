@@ -1,4 +1,6 @@
 from data.grammar import NonTerminalType as N, Terminal as T
+from data.semantic_actions import semantic_actions_dict
+
 
 class Derivation:
     def __init__(self, head: N, tail: list):
@@ -101,9 +103,25 @@ ProductionList = {
         N.INDEXEXPRESSION, [T.OPEN_SB, N.NUMEXPRESSION, T.CLOSE_SB, N.INDEXEXPRESSION]
     ),
     49: Derivation(N.INDEXEXPRESSION, []),
-    50: Derivation(N.EXPRESSION, [N.NUMEXPRESSION, N.MAYBECOMPARE]),
-    51: Derivation(N.MAYBECOMPARE, [N.COMPARISON, N.NUMEXPRESSION]),
-    52: Derivation(N.MAYBECOMPARE, []),
+    50: Derivation(
+        N.EXPRESSION,
+        [
+            N.NUMEXPRESSION,
+            semantic_actions_dict[2],
+            N.MAYBECOMPARE,
+            semantic_actions_dict[1],
+        ],
+    ),
+    51: Derivation(
+        N.MAYBECOMPARE,
+        [
+            N.COMPARISON,
+            semantic_actions_dict[3],
+            semantic_actions_dict[4],
+            N.NUMEXPRESSION,
+        ],
+    ),
+    52: Derivation(N.MAYBECOMPARE, [semantic_actions_dict[5]]),
     53: Derivation(N.COMPARISON, [T.LESS_THAN]),
     54: Derivation(N.COMPARISON, [T.GREATER_THAN]),
     55: Derivation(N.COMPARISON, [T.LESS_EQUAL]),

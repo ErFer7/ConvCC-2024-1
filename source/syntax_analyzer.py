@@ -5,7 +5,7 @@ from data.symbol_table import SymbolTable
 from data.grammar import NonTerminalType, Terminal
 from data.derivation_tables import DerivationTable, ProductionList
 from return_status import SyntaxReturnStatus
-from semantic_analyzer import SemanticAction
+from data.semantic_actions import SemanticAction
 
 
 class SyntaxAnalyzer:
@@ -22,13 +22,13 @@ class SyntaxAnalyzer:
         symbol_table: SymbolTable,
         stack: list,
         current_token_index: int,
-        current_stack_element: str | Terminal | NonTerminalType | SemanticAction | Any
+        current_stack_element: str | Terminal | NonTerminalType | SemanticAction | Any,
     ) -> tuple[SyntaxReturnStatus, int]:
         """
         Analisa a lista de tokens.
         """
 
-        if current_token == '':
+        if current_token == "":
             # verificar se o fundo de pilha está na tabela
             if "" in DerivationTable[current_stack_element]:
                 production_rules = ProductionList[

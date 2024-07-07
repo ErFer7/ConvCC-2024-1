@@ -1,5 +1,11 @@
 """
 Compilador.
+
+Grupo:
+Bruno Pamplona Huebes
+Eric Fernandes Evaristo
+Gabriela Furtado da Silveira
+Otávio Wada
 """
 
 import sys
@@ -9,13 +15,14 @@ from lexical_analyzer import LexicalAnalyzer
 from sdt_processor import SDTProcessor
 from return_status import LexicalReturnStatus, ReturnStatus
 
+
 def main() -> None:
     if len(argv) < 2:
         print('Usage: lexical_test "source_file.txt"')
         sys.exit()
 
     try:
-        with open(argv[1], 'r', encoding='utf-8') as source_file:
+        with open(argv[1], "r", encoding="utf-8") as source_file:
             source = source_file.read()
     except IOError:
         sys.exit()
@@ -28,22 +35,23 @@ def main() -> None:
         print(status.get_message())
         return
 
-    print('Token list contents: ')
+    print("Token list contents: ")
 
     for token in tokens:
-        print(f'{token} ', end='')
+        print(f"{token} ", end="")
 
-    print('\n\n')
+    print("\n\n")
     print(symbol_table)
 
     return_code, token = SDTProcessor.process(tokens, symbol_table)
-    print('\n')
+    print("\n")
 
     status = ReturnStatus(return_code, token)
 
     print(status.get_message())
     if status.has_errors():
         return
+
 
 if __name__ == "__main__":
     main()
