@@ -97,7 +97,7 @@ class Node:
                         self.no=self.children[2].no    
             case N.FACTOR:
                 if len(self.lchildren())>1:
-                    if self.children[1].nodemain()==N.EXPRESSION and self.children[1].no:
+                    if self.children[1].no:
                         self.no= self.children[1].no
                 else:
                     self.parcial=Node(self.lchildren()[0].nodemain())

@@ -60,8 +60,8 @@ ProductionList = {
     35: Derivation(N.SOCALLMEMAYBE, [T.COMMA, N.PARAMLISTCALL]),
     36: Derivation(N.SOCALLMEMAYBE, []),
     37: Derivation(N.PRINTSTAT, [T.PRINT, N.EXPRESSION]),
-    38: Derivation(N.READSTAT, [N.LVALUE]),
-    39: Derivation(N.RETURNSTAT, [N.EXPRESSION]),
+    38: Derivation(N.READSTAT, [T.READ, N.LVALUE]),
+    39: Derivation(N.RETURNSTAT, [T.RETURN, N.EXPRESSION]),
     40: Derivation(
         N.IFSTAT,
         [
