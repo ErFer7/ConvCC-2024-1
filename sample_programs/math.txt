@@ -132,7 +132,8 @@ def normal3 (float x, float y, float z) {
   return normal;
 }
 
-print "testing functions";
+def main(int _) {
+print “testing functions”;
 
 int fib;
 fib = call fibonacci(7);
@@ -162,4 +163,5 @@ print normal_three[0];
 print normal_three[1];
 print normal_three[2];
 
-print "complete";
+print “complete”;
+}
