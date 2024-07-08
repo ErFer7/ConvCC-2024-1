@@ -52,7 +52,7 @@ class LexicalAnalyzer:
 
             match (state):
                 case LexicalAnalyzerStates.WHITE_SPACE:
-                    if next_ in ' \n':
+                    if next_.isspace():
                         if next_ == '\n':
                             current_line += 1
                             current_column = 0
