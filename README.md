@@ -39,7 +39,7 @@ MAYBEARRAY  → ARRAYSIZE | ε
 
 ATRIBSTAT → LVALUE = ATRIBEXPR
 
-ATRIBEXPR → EXPRESSION | ALLOCEXPRESSION | FUNCCALL 
+ATRIBEXPR → EXPRESSION | ALLOCEXPRESSION | FUNCCALL
 
 FUNCCALL → call ident(PARAMLISTCALL)
 
@@ -87,12 +87,12 @@ ADDSUB → + | - | or
 
 UNARYEXPR → + FACTOR | − FACTOR | FACTOR | not FACTOR
 
-FACTOR → int_constant | float_constant | string_constant | null | LVALUE | (EXPRESSION)
+FACTOR → int_constant | float_constant | string_constant | null | LVALUE |
+(EXPRESSION)
 
 LVALUE → ident INDEXEXPRESSION
 
-
-## Execução:
+### Execução:
 
 Por utilizar Python, o compilador pode ser executado diretamente com o comando “make ARGS=[entrada.txt]“ com entrada.txt sendo o arquivo de código a ser analisado.
 
@@ -102,4 +102,5 @@ ex.:
 Alguns programas teste estão incluídos na pasta sample_programs, os principais sendo math.txt,data.txt, e datetime_calc.txt
 
 ## IMPORTANTE:
-Os analisadores léxico e sintático funcionam, porém o analisador sintático e o GCI não possuem saída visível. Os seus códigos ainda estão presentes na entrega, caso seja relevante para a avaliação.
+
+Os analisadores léxico e sintático funcionam, porém o analisador sintático e o GCI não possuem saída visível. O código iniciado para a análise semântica ainda está presente na entrega, caso seja relevante para a avaliação, porém não foi possível concluir os processos que gerariam as saídas adequdas. Portanto, a saída atual apenas contém a lista de tokens e a tabela de símbolos, criadas na análise sintática.
