@@ -86,7 +86,7 @@ def main (int _) {
   read password;
   string salt;
   salt = call user_salt(id);
-  password = salt + password
+  password = salt + password;
 
   int auth;
   auth = call match_password(id,password);
@@ -110,10 +110,7 @@ def main (int _) {
       print "Your mark is " + mark + ".";
     }
   }
-
   print "Goodbye.";
   return 0;
 }
 
-int result;
-result = main(0);

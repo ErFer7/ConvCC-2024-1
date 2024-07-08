@@ -1,0 +1,113 @@
+def leap_yeap (int year) {
+  if (year % 400 == 0) {
+    return 1;
+  }
+  if ((year % 4 == 0) and (year % 100 != 0)) {
+    return 1;
+  }
+  return 0;
+}
+
+def wasted_time (int how_long) {
+  int i;
+  int result;
+  result = 0;
+  if (how_long % 3) {
+    for (i = 0; i < how_long; i = i + 3) {
+      result = result + 4 * i;
+    }
+  }
+  if (how_long) {
+    for (i = 0; i < how_long; i = i + 5) {
+      result = result + 31;
+    }
+  }
+  return result;
+}
+
+def month_length (int month, int is_leap) {
+  if ((month < 1) or (month > 12)) {
+    return 0;
+  }
+  if (month == 2) {
+    return 28 + is_leap;
+  }
+  if (month < 8) {
+    return 30 + month % 2;
+  }
+  return 31 - month % 2;
+}
+
+def which_month (int day, int is_leap) {
+  int m;
+  int last;
+  for (m = 1; m < 13; m = m + 1) {
+    last = call month_length(m,is_leap);
+    if (last >= day) {
+      break;
+    }
+    day = day - last;
+  }
+  return m;
+}
+
+def which_day (int day, int month, int is_leap) {
+  int m;
+  int last;
+  for (m = 1; m < month; m = m + 1) {
+    last = call month_length(m,is_leap);
+    day = day + last;
+  }
+  return day;
+}
+
+def difference_date (int year1, int month1, int day1, int year2, int month2, int day2) {
+  int totalday1;
+  int totalday2;
+  int is_leap1;
+  int is_leap2;
+  is_leap1 = call leap_yeap(year1);
+  is_leap2 = call leap_yeap(year2);
+  totalday1 = call which_day(day1,month1,is_leap1);
+  totalday2 = call which_day(day2,month2,is_leap2);
+  int d_diff;
+  diff = 0;
+  int y;
+  int leap_e;
+  for (y = year1; y < year2; y = y + 1) {
+    leap_e = call leap_yeap(y);
+    d_diff = d_diff + 365 + leap_e;
+  }
+  if (totalday1 > totalday2) {
+    leap_e = call leap_yeap(y);
+    d_diff = d_diff - 365 + leap_e;
+  }
+  d_diff = d_diff + totalday2 - totalday1;
+  return d_diff;
+}
+
+def main(int _) {
+print "Calculadora de distancia entre dois dias";
+print "Insira o ano da primeira data";
+int year1;
+read year1;
+print "Insira o mes da primeira data";
+int month1;
+read month1;
+print "Insira o dia da primeira data";
+int day1;
+read day1;
+print "Insira o ano da segunda data";
+int year2;
+read year2;
+print "Insira o mes da segunda data";
+int month2;
+read month2;
+print "Insira o dia da segunda data";
+int day2;
+read day2;
+int difference;
+difference = call difference_date(year1,month1,day1,year2,month2,day2);
+print "A diferenca das datas em dias eh de:";
+print difference;
+}

@@ -37,3 +37,10 @@ bin
 # Compile commands
 compile_commands.json
 .cache
+
+# Python
+__pycache__
+
+# VSCode
+.vscode
+.pytest_cache
