@@ -6,7 +6,7 @@ from enum import Enum
 
 from data.token import Token
 from data.grammar import Terminal, STRING_TO_TERMINAL, ONE_CHAR_DEFINITIVE_TERMINALS
-from data.symbol_table import SymbolTable
+from symbol_table import SymbolTable
 
 from return_status import LexicalReturnStatus
 

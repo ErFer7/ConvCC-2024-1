@@ -22,26 +22,60 @@ class ArithmeticTree:
 
 
 class DerivationNode:
-    _symbol: N | Token
-    _children: list["DerivationNode"]
-    _no: ArithmeticNode
-    _parcial: ArithmeticNode
-    _type: T.INT | T.FLOAT | T.STRING
+    symbol: N | Token | T
+    children: list["DerivationNode"]
+    no: ArithmeticNode
+    parcial: ArithmeticNode
+    type: T
 
-    def __init__(self, symbol):
-        self.symbol_ = symbol
-        self.children_ = []
+    def __init__(self, symbol, parent=None) -> None:
+        self.symbol = symbol
+        self.parent = parent
+        self.children = []
         self.no = None
         self.parcial = None
-
-    def symbol(self):
-        return self.symbol_
-
-    def children(self):
-        return self.children_
+        self.visit_count = 0
 
     def add_children(self, node):
-        self.children_.append(node)
+        self.children.append(node)
+
+    def get_next(self):
+        if not self.children and not self.parent:
+            return self
+
+        self.visit_count += 1
+        if self.visit_count < len(self.children):
+            return self.children[self.visit_count - 1]
+        if self.parent:
+            return self.parent
+        return self
+
+
+class DerivationTree:
+    root: DerivationNode
+    most_recent_node: DerivationNode
+
+    def __init__(self, root) -> None:
+        self.root = copy.copy(root)
+        self.most_recent_node = self.root
+
+    def create_nodes(self, parent, children_values):
+        for value in children_values:
+            if isinstance(value, T) or isinstance(value, N):
+                new_node = DerivationNode(value, parent)
+                parent.add_children(copy.copy(new_node))
+
+    # def get_next_node(self):
+    #     parent = self.most_recent_node.parent()
+    #     list_of_children = parent.children
+    #     curr_id = list_of_children.index(self.most_recent_node)
+    #     if curr_id + 1 < len(parent.children):
+    #         return list_of_children[curr_id + 1]
+
+    def get_parent(self, node: DerivationNode):
+        if node.parent:
+            return node.parent
+        return node
 
 
 class SemanticAction:
@@ -68,19 +102,19 @@ class SemanticAction:
 
 
 def rule_right_synth(node: DerivationNode):
-    node.no = node.children_[-1].no
+    node.no = node.children[-1].no
 
 
 def rule_left_to_right(node: DerivationNode):
-    node.children_[1].parcial = node.children_[0].no
+    node.children[1].parcial = node.children[0].no
 
 
 def rule_left_synth(node: DerivationNode):
-    node.no = node.children_[0].no
+    node.no = node.children[0].no
 
 
 def rule_parcial_inherit(node: DerivationNode):
-    node.children_[1].parcial = node.parcial
+    node.children[1].parcial = node.parcial
 
 
 def rule_end_derivation(node: DerivationNode):
@@ -88,47 +122,47 @@ def rule_end_derivation(node: DerivationNode):
 
 
 def rule_create_empty(node: DerivationNode):
-    token = node.symbol_
+    token = node.symbol
     value = SemanticAction.get_arithmetic_value(token)
     new_arithmetic_node = ArithmeticNode(value, None, None)
     node.no = copy.deepcopy(new_arithmetic_node)
 
 
 def rule7(node: DerivationNode):
-    value = SemanticAction.get_arithmetic_value(node.children_[0].symbol_)
+    value = SemanticAction.get_arithmetic_value(node.children[0].symbol)
     left = node.parcial
-    right = node.children_[2].no
+    right = node.children[2].no
     new_arithmetic_node = ArithmeticNode(value, left, right)
     node.no = copy.deepcopy(new_arithmetic_node)
 
 
 def rule8(node: DerivationNode):
-    node.children_[2] = node.children_[1]
+    node.children[2] = node.children[1]
 
 
 def rule9(node: DerivationNode):
-    value = SemanticAction.get_arithmetic_value(node.children_[0].symbol_)
-    left = node.children_[1].parcial
+    value = SemanticAction.get_arithmetic_value(node.children[0].symbol)
+    left = node.children[1].parcial
     new_arithmetic_node = ArithmeticNode(value, left, None)
-    node.children_[1].no = copy.deepcopy(new_arithmetic_node)
+    node.children[1].no = copy.deepcopy(new_arithmetic_node)
 
 
 def rule10(node: DerivationNode):
-    value = SemanticAction.get_arithmetic_value(node.children_[0].symbol_)
+    value = SemanticAction.get_arithmetic_value(node.children[0].symbol)
     new_arithmetic_node = ArithmeticNode(value, None, None)
     node.parcial = copy.deepcopy(new_arithmetic_node)
 
 
 def rule11(node: DerivationNode):
-    node.parcial = node.children_[0].no
+    node.parcial = node.children[0].no
 
 
 def rule12(node: DerivationNode):
-    node.no = node.children_[1].no
+    node.no = node.children[1].no
 
 
 def rule13(node: DerivationNode):  # para tratar LVALUE, a princípio
-    value = SemanticAction.get_arithmetic_value(node.children_[0].symbol_)
+    value = SemanticAction.get_arithmetic_value(node.children[0].symbol)
     new_arithmetic_node = ArithmeticNode(value, None, None)
     node.no = copy.deepcopy(new_arithmetic_node)
 

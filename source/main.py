@@ -17,12 +17,12 @@ from return_status import LexicalReturnStatus, ReturnStatus
 
 
 def main() -> None:
-    if len(argv) < 2:
-        print('Usage: lexical_test "source_file.txt"')
-        sys.exit()
+    # if len(argv) < 2:
+    #     print('Usage: lexical_test "source_file.txt"')
+    #     sys.exit()
 
     try:
-        with open(argv[1], "r", encoding="utf-8") as source_file:
+        with open("sample_programs/data.txt", "r", encoding="utf-8") as source_file:
             source = source_file.read()
     except IOError:
         sys.exit()
@@ -43,7 +43,7 @@ def main() -> None:
     print("\n\n")
     print(symbol_table)
 
-    return_code, token = SDTProcessor.process(tokens, symbol_table)
+    return_code, token = SDTProcessor().process(tokens, symbol_table)
     print("\n")
 
     status = ReturnStatus(return_code, token)

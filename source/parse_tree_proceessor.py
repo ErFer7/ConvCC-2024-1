@@ -1,5 +1,5 @@
 from data.token import Token
-from data.symbol_table import SymbolTable
+from symbol_table import SymbolTable
 from data.grammar import NonTerminalType as N, Terminal as T
 from data.derivation_tables import Derivation, DerivationTable, ProductionList
 import sys

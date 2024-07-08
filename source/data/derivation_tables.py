@@ -137,9 +137,9 @@ ProductionList = {
         [
             N.ADDSUB,
             N.TERM,
-            semantic_actions_dict[7],
             semantic_actions_dict[8],
             N.INDEXTERM,
+            semantic_actions_dict[7],
         ],
     ),
     61: Derivation(N.INDEXTERM, [semantic_actions_dict[5]]),
