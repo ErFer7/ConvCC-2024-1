@@ -1,4 +1,5 @@
 from data.grammar import NonTerminalType as N, Terminal as T
+from data.semantic_actions import semantic_actions_dict
 
 
 class Derivation:
@@ -60,8 +61,8 @@ ProductionList = {
     35: Derivation(N.SOCALLMEMAYBE, [T.COMMA, N.PARAMLISTCALL]),
     36: Derivation(N.SOCALLMEMAYBE, []),
     37: Derivation(N.PRINTSTAT, [T.PRINT, N.EXPRESSION]),
-    38: Derivation(N.READSTAT, [N.LVALUE]),
-    39: Derivation(N.RETURNSTAT, [N.EXPRESSION]),
+    38: Derivation(N.READSTAT, [T.READ, N.LVALUE]),
+    39: Derivation(N.RETURNSTAT, [T.RETURN, N.EXPRESSION]),
     40: Derivation(
         N.IFSTAT,
         [
@@ -96,27 +97,67 @@ ProductionList = {
     46: Derivation(N.MAYBESTATELIST, []),
     47: Derivation(
         N.ALLOCEXPRESSION,
-        [T.NEW, N.TYPE, T.OPEN_SB, N.NUMEXPRESSION, T.CLOSE_SB, N.INDEXEXPRESSION],
+        [T.NEW, N.TYPE_DECL, T.OPEN_SB, N.NUMEXPRESSION, T.CLOSE_SB, N.INDEXEXPRESSION],
     ),
     48: Derivation(
         N.INDEXEXPRESSION, [T.OPEN_SB, N.NUMEXPRESSION, T.CLOSE_SB, N.INDEXEXPRESSION]
     ),
     49: Derivation(N.INDEXEXPRESSION, []),
-    50: Derivation(N.EXPRESSION, [N.NUMEXPRESSION, N.MAYBECOMPARE]),
-    51: Derivation(N.MAYBECOMPARE, [N.COMPARISON, N.NUMEXPRESSION]),
-    52: Derivation(N.MAYBECOMPARE, []),
-    53: Derivation(N.COMPARISON, [T.LESS_THAN]),
-    54: Derivation(N.COMPARISON, [T.GREATER_THAN]),
-    55: Derivation(N.COMPARISON, [T.LESS_EQUAL]),
-    56: Derivation(N.COMPARISON, [T.GREATER_EQUAL]),
-    57: Derivation(N.COMPARISON, [T.EQUAL]),
-    58: Derivation(N.COMPARISON, [T.NOT_EQUAL]),
-    59: Derivation(N.NUMEXPRESSION, [N.TERM, N.INDEXTERM]),
-    60: Derivation(N.INDEXTERM, [N.ADDSUB, N.TERM, N.INDEXTERM]),
-    61: Derivation(N.INDEXTERM, []),
-    62: Derivation(N.TERM, [N.UNARYEXPR, N.MULTUNARY]),
-    63: Derivation(N.MULTUNARY, [N.MULDIV, N.UNARYEXPR, N.MULTUNARY]),
-    64: Derivation(N.MULTUNARY, []),
+    50: Derivation(
+        N.EXPRESSION,
+        [
+            N.NUMEXPRESSION,
+            semantic_actions_dict[2],
+            N.MAYBECOMPARE,
+            semantic_actions_dict[1],
+        ],
+    ),
+    51: Derivation(
+        N.MAYBECOMPARE,
+        [
+            N.COMPARISON,
+            semantic_actions_dict[3],
+            semantic_actions_dict[4],
+            N.NUMEXPRESSION,
+        ],
+    ),
+    52: Derivation(N.MAYBECOMPARE, [semantic_actions_dict[5]]),
+    53: Derivation(N.COMPARISON, [T.LESS_THAN, semantic_actions_dict[6]]),
+    54: Derivation(N.COMPARISON, [T.GREATER_THAN, semantic_actions_dict[6]]),
+    55: Derivation(N.COMPARISON, [T.LESS_EQUAL, semantic_actions_dict[6]]),
+    56: Derivation(N.COMPARISON, [T.GREATER_EQUAL, semantic_actions_dict[6]]),
+    57: Derivation(N.COMPARISON, [T.EQUAL, semantic_actions_dict[6]]),
+    58: Derivation(N.COMPARISON, [T.NOT_EQUAL, semantic_actions_dict[6]]),
+    59: Derivation(
+        N.NUMEXPRESSION,
+        [N.TERM, semantic_actions_dict[2], N.INDEXTERM, semantic_actions_dict[1]],
+    ),
+    60: Derivation(
+        N.INDEXTERM,
+        [
+            N.ADDSUB,
+            N.TERM,
+            semantic_actions_dict[8],
+            N.INDEXTERM,
+            semantic_actions_dict[7],
+        ],
+    ),
+    61: Derivation(N.INDEXTERM, [semantic_actions_dict[5]]),
+    62: Derivation(
+        N.TERM,
+        [N.UNARYEXPR, semantic_actions_dict[2], N.MULTUNARY, semantic_actions_dict[1]],
+    ),
+    63: Derivation(
+        N.MULTUNARY,
+        [
+            N.MULDIV,
+            N.UNARYEXPR,
+            semantic_actions_dict[7],
+            semantic_actions_dict[8],
+            N.MULTUNARY,
+        ],
+    ),
+    64: Derivation(N.MULTUNARY, [semantic_actions_dict[5]]),
     65: Derivation(N.MULDIV, [T.MULTIPLY]),
     66: Derivation(N.MULDIV, [T.DIVISION]),
     67: Derivation(N.MULDIV, [T.REMAINDER]),
@@ -124,17 +165,30 @@ ProductionList = {
     69: Derivation(N.ADDSUB, [T.ADDITION]),
     70: Derivation(N.ADDSUB, [T.SUBTRACT]),
     71: Derivation(N.ADDSUB, [T.OR]),
-    72: Derivation(N.UNARYEXPR, [T.ADDITION, N.FACTOR]),
-    73: Derivation(N.UNARYEXPR, [T.SUBTRACT, N.FACTOR]),
-    74: Derivation(N.UNARYEXPR, [N.FACTOR]),
-    75: Derivation(N.UNARYEXPR, [T.NOT, N.FACTOR]),
-    76: Derivation(N.FACTOR, [T.INT_CONST]),
-    77: Derivation(N.FACTOR, [T.FLOAT_CONST]),
+    72: Derivation(
+        N.UNARYEXPR,
+        [T.ADDITION, N.FACTOR, semantic_actions_dict[9], semantic_actions_dict[1]],
+    ),
+    73: Derivation(
+        N.UNARYEXPR,
+        [T.SUBTRACT, N.FACTOR, semantic_actions_dict[9], semantic_actions_dict[1]],
+    ),
+    74: Derivation(
+        N.UNARYEXPR, [N.FACTOR, semantic_actions_dict[5], semantic_actions_dict[3]]
+    ),
+    75: Derivation(
+        N.UNARYEXPR,
+        [T.NOT, N.FACTOR, semantic_actions_dict[9], semantic_actions_dict[1]],
+    ),
+    76: Derivation(N.FACTOR, [T.INT_CONST, semantic_actions_dict[10]]),
+    77: Derivation(N.FACTOR, [T.FLOAT_CONST, semantic_actions_dict[10]]),
     78: Derivation(N.FACTOR, [T.STRING_CONST]),
-    79: Derivation(N.FACTOR, [T.NULL_CONST]),
-    80: Derivation(N.FACTOR, [N.LVALUE]),
-    81: Derivation(N.FACTOR, [T.OPEN_P, N.EXPRESSION, T.CLOSE_P]),
-    82: Derivation(N.LVALUE, [T.IDENT, N.INDEXEXPRESSION]),
+    79: Derivation(N.FACTOR, [T.NULL_CONST, semantic_actions_dict[10]]),
+    80: Derivation(N.FACTOR, [N.LVALUE, semantic_actions_dict[11]]),
+    81: Derivation(
+        N.FACTOR, [T.OPEN_P, N.EXPRESSION, T.CLOSE_P, semantic_actions_dict[12]]
+    ),
+    82: Derivation(N.LVALUE, [T.IDENT, semantic_actions_dict[10], N.INDEXEXPRESSION]),
 }
 
 DerivationTable = {
@@ -160,7 +214,7 @@ DerivationTable = {
     N.PARAMLIST: {T.INT: 8, T.FLOAT: 8, T.STRING: 8},
     N.PARAMETER: {T.IDENT: 9},
     N.MAYBEPARAMS: {T.CLOSE_P: 11, T.COMMA: 10},
-    N.TYPE: {T.INT: 12, T.FLOAT: 13, T.STRING: 14},
+    N.TYPE_DECL: {T.INT: 12, T.FLOAT: 13, T.STRING: 14},
     N.STATEMENT: {
         T.IDENT: 16,
         T.OPEN_CB: 22,

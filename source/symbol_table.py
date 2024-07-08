@@ -3,8 +3,8 @@ Tabela de símbolos.
 """
 
 from data.scope import Scope
-from data.grammar import Terminal as T
-from source.return_status import SemanticReturnStatus
+from data.grammar import Terminal
+from return_status import SemanticReturnStatus
 
 
 class Symbol:
@@ -15,7 +15,7 @@ class Symbol:
     _name: str
     position: tuple[int, int]
     scope: Scope | None
-    type_: T.INT | T.FLOAT | T.STRING | None
+    type_: Terminal | None
     value: int | float | str | None
     _is_declaration: bool
 
@@ -79,7 +79,7 @@ class SymbolTable:
                 symbol.scope = scope
 
     def set_symbol_type(
-        self, name: str, line: int, column: int, type_: T.INT | T.FLOAT | T.STRING
+        self, name: str, line: int, column: int, type_: Terminal
     ) -> None:
         """
         Define o tipo de um símbolo.
@@ -100,7 +100,9 @@ class SymbolTable:
             if symbol.position == (line, column):
                 symbol.value = value
 
-    def check_scope_validity(self, name: str, line: int, column: int) -> bool:
+    def check_scope_validity(
+        self, name: str, line: int, column: int
+    ) -> SemanticReturnStatus:
         """
         Verifica se um símbolo está em um escopo válido.
         """
@@ -117,7 +119,19 @@ class SymbolTable:
             if symbol.is_declaration:
                 symbol_declarations.append(symbol)
 
+        # Se o símbolo é uma declaração, verifica se algum outro
+        # símbolo com o mesmo nome já foi declarado no mesmo escopo ou num escopo superior
         if symbol_instance.is_declaration:
-            pass
-        else:
+            for declaration in symbol_declarations:
+                if declaration.position != symbol_instance.position:
+                    if declaration.scope.is_in_scope(symbol_instance.scope):
+                        return SemanticReturnStatus.DOUBLE_DECLARATION
+            return SemanticReturnStatus.OK
 
+        # Se o símbolo é apenas usado, verifica se há uma declaração no mesmo
+        # escopo ou num escopo superior
+        for declaration in symbol_declarations:
+            if declaration.scope.is_in_scope(symbol_instance.scope):
+                return SemanticReturnStatus.OK
+
+        return SemanticReturnStatus.UNDECLARED_SYMBOL

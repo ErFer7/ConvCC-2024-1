@@ -98,6 +98,7 @@ class NonTerminalType(Enum):
     LVALUE = "LVALUE"
 
 
+
 STRING_TO_TERMINAL = {member.value: member for member in Terminal}
 
 # Terminais que são definitivos com um único caractere e não são o começo de outro terminal maior

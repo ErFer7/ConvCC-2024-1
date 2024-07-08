@@ -6,8 +6,9 @@ from enum import Enum
 
 from data.token import Token
 from data.grammar import Terminal, STRING_TO_TERMINAL, ONE_CHAR_DEFINITIVE_TERMINALS
-from data.symbol_table import SymbolTable
+from symbol_table import SymbolTable
 
+from return_status import LexicalReturnStatus
 
 class LexicalAnalyzerStates(Enum):
     """
@@ -25,61 +26,50 @@ class LexicalAnalyzerStates(Enum):
     LESS_OR_LE = 8        # may find < or <=
     DIFFERENT = 9         # must find = after !
 
-
-class LexicalReturnStatus(Enum):
-    """
-    Status de retorno do analisador léxico.
-    """
-
-    OK = 0
-    INVALID_CHAR = 1
-    INVALID_NUMBER_FORMAT = 2
-    UNCLOSED_STRING = 3
-
-
 class LexicalAnalyzer:
     """
     Analisador léxico.
     """
 
     @staticmethod
-    def analyze(source: str) -> tuple[LexicalReturnStatus, str, list[Token], SymbolTable]:
+    def analyze(source: str) -> tuple[LexicalReturnStatus, tuple[int,int], list[Token], SymbolTable]:
         """
         Analisa o código fonte e retorna a lista de tokens.
         """
 
+        source += ' '
         symbol_table = SymbolTable()
         token_list: list[Token] = []
         state = LexicalAnalyzerStates.WHITE_SPACE
-        line = 1
-        column = 1
+        current_line = 1
+        current_column = 1
         token_column = 1
         index = 0
-        token = ''
+        current_token = ''
 
         while index < len(source):
             next_ = source[index]
 
             match (state):
                 case LexicalAnalyzerStates.WHITE_SPACE:
-                    if next_ in ' \n':
+                    if next_.isspace():
                         if next_ == '\n':
-                            line += 1
-                            column = 0
+                            current_line += 1
+                            current_column = 0
 
                         index += 1
-                        column += 1
+                        current_column += 1
                     else:
                         state = LexicalAnalyzerStates.READ_SIMPLE
                 case LexicalAnalyzerStates.READ_SIMPLE:
-                    token_column = column
+                    token_column = current_column
 
                     if next_.isalpha() or next_ == '_':
                         state = LexicalAnalyzerStates.MAYBE_IDENT
-                        token += next_
+                        current_token += next_
                     elif next_.isdigit():
                         state = LexicalAnalyzerStates.NUMERAL
-                        token += next_
+                        current_token += next_
                     elif next_ == '"':
                         state = LexicalAnalyzerStates.STRING_LITERAL
                     elif next_ == '=':
@@ -91,104 +81,105 @@ class LexicalAnalyzer:
                     elif next_ == '!':
                         state = LexicalAnalyzerStates.DIFFERENT
                     else:
+                        # TODO: Otimizar isso aqui, daria pra só comparar pra ver se o next é um dos ONE_CHAR_DEFINITIVE_TERMINALS
                         if next_ in STRING_TO_TERMINAL and STRING_TO_TERMINAL[next_] in ONE_CHAR_DEFINITIVE_TERMINALS:
                             state = LexicalAnalyzerStates.WHITE_SPACE
-                            token_list.append(Token(STRING_TO_TERMINAL[next_], line, token_column))
+                            token_list.append(Token(STRING_TO_TERMINAL[next_], current_line, token_column))
                         else:
-                            return LexicalReturnStatus.INVALID_CHAR, next_, token_list, symbol_table
+                            return LexicalReturnStatus.INVALID_CHAR, (current_line,current_column), token_list, symbol_table
 
                     index += 1
-                    column += 1
+                    current_column += 1
                 case LexicalAnalyzerStates.MAYBE_IDENT:
                     if next_.isalnum() or next_ == '_':
-                        token += next_
+                        current_token += next_
                         index += 1
-                        column += 1
+                        current_column += 1
                     else:
                         state = LexicalAnalyzerStates.WHITE_SPACE
 
-                        if token in STRING_TO_TERMINAL:
-                            token_list.append(Token(STRING_TO_TERMINAL[token], line, token_column))
+                        if current_token in STRING_TO_TERMINAL:
+                            token_list.append(Token(STRING_TO_TERMINAL[current_token], current_line, token_column))
                         else:
-                            token_list.append(Token(Terminal.IDENT, line, token_column, token))
-                            symbol_table.add_symbol_instance(token, line, token_column)
-                        token = ''
+                            token_list.append(Token(Terminal.IDENT, current_line, token_column, current_token))
+                            symbol_table.add_symbol_instance(current_token, current_line, token_column)
+                        current_token = ''
                 case LexicalAnalyzerStates.NUMERAL:
                     if next_.isdigit():
-                        token += next_
+                        current_token += next_
                         index += 1
-                        column += 1
+                        current_column += 1
                     elif next_ == '.':
                         state = LexicalAnalyzerStates.FLOAT_FRACTIONAL
-                        token += next_
+                        current_token += next_
                         index += 1
-                        column += 1
+                        current_column += 1
                     elif next_.isalpha() or next_ == '_':
-                        return LexicalReturnStatus.INVALID_NUMBER_FORMAT, next_, token_list, symbol_table
+                        return LexicalReturnStatus.INVALID_NUMBER_FORMAT, (current_line,current_column), token_list, symbol_table
                     else:
                         state = LexicalAnalyzerStates.WHITE_SPACE
-                        token_list.append(Token(Terminal.INT_CONST, line, token_column, token))
-                        token = ''
+                        token_list.append(Token(Terminal.INT_CONST, current_line, token_column, current_token))
+                        current_token = ''
                 case LexicalAnalyzerStates.FLOAT_FRACTIONAL:
                     if next_.isdigit():
-                        token += next_
+                        current_token += next_
                         index += 1
-                        column += 1
+                        current_column += 1
                     elif next_.isalpha() or next_ == '_':
-                        return LexicalReturnStatus.INVALID_NUMBER_FORMAT, next_, token_list, symbol_table
+                        return LexicalReturnStatus.INVALID_NUMBER_FORMAT, (current_line,current_column), token_list, symbol_table
                     else:
                         state = LexicalAnalyzerStates.WHITE_SPACE
-                        token_list.append(Token(Terminal.FLOAT_CONST, line, token_column, token))
-                        token = ''
+                        token_list.append(Token(Terminal.FLOAT_CONST, current_line, token_column, current_token))
+                        current_token = ''
                 case LexicalAnalyzerStates.STRING_LITERAL:
                     if next_ == '"':
                         state = LexicalAnalyzerStates.WHITE_SPACE
-                        token_list.append(Token(Terminal.STRING_CONST, line, token_column, token))
-                        token = ''
+                        token_list.append(Token(Terminal.STRING_CONST, current_line, token_column, current_token))
+                        current_token = ''
                     elif next_ == '\n':
-                        return LexicalReturnStatus.UNCLOSED_STRING, next_, token_list, symbol_table
+                        return LexicalReturnStatus.UNCLOSED_STRING, (current_line,current_column), token_list, symbol_table
                     else:
-                        token += next_
+                        current_token += next_
 
                     index += 1
-                    column += 1
+                    current_column += 1
                 case LexicalAnalyzerStates.ASSIGN_OR_EQUAL:
                     state = LexicalAnalyzerStates.WHITE_SPACE
                     if next_ == '=':
-                        token_list.append(Token(Terminal.EQUAL, line, token_column))
+                        token_list.append(Token(Terminal.EQUAL, current_line, token_column))
                         index += 1
-                        column += 1
+                        current_column += 1
                     else:
-                        token_list.append(Token(Terminal.ASSIGNMENT, line, token_column))
-                    token = ''
+                        token_list.append(Token(Terminal.ASSIGNMENT, current_line, token_column))
+                    current_token = ''
                 case LexicalAnalyzerStates.GREATER_OR_GE:
                     state = LexicalAnalyzerStates.WHITE_SPACE
                     if next_ == '=':
-                        token_list.append(Token(Terminal.GREATER_EQUAL, line, token_column))
+                        token_list.append(Token(Terminal.GREATER_EQUAL, current_line, token_column))
                         index += 1
-                        column += 1
+                        current_column += 1
                     else:
-                        token_list.append(Token(Terminal.GREATER_THAN, line, token_column))
-                    token = ''
+                        token_list.append(Token(Terminal.GREATER_THAN, current_line, token_column))
+                    current_token = ''
                 case LexicalAnalyzerStates.LESS_OR_LE:
                     state = LexicalAnalyzerStates.WHITE_SPACE
                     if next_ == '=':
-                        token_list.append(Token(Terminal.LESS_EQUAL, line, token_column))
+                        token_list.append(Token(Terminal.LESS_EQUAL, current_line, token_column))
                         index += 1
-                        column += 1
+                        current_column += 1
                     else:
-                        token_list.append(Token(Terminal.LESS_THAN, line, token_column))
-                    token = ''
+                        token_list.append(Token(Terminal.LESS_THAN, current_line, token_column))
+                    current_token = ''
                 case LexicalAnalyzerStates.DIFFERENT:
                     state = LexicalAnalyzerStates.WHITE_SPACE
                     if next_ == '=':
-                        token_list.append(Token(Terminal.NOT_EQUAL, line, token_column))
+                        token_list.append(Token(Terminal.NOT_EQUAL, current_line, token_column))
                         index += 1
-                        column += 1
+                        current_column += 1
                     else:
-                        return LexicalReturnStatus.INVALID_CHAR, next_, token_list, symbol_table
-                    token = ''
+                        return LexicalReturnStatus.INVALID_CHAR, (current_line,current_column), token_list, symbol_table
+                    current_token = ''
                 case _:
                     print('\n\nWhat\n\n')
 
-        return LexicalReturnStatus.OK, '', token_list, symbol_table
+        return LexicalReturnStatus.OK, (0,0), token_list, symbol_table
