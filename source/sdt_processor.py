@@ -47,17 +47,17 @@ class SDTProcessor:
         current_token_index = 0
         current_token = tokens[current_token_index]
 
-        self.init_derivation_tree(current_stack_element)
-        current_derivation_node = self._derivation_tree.root
+        # current_derivation_node = self._derivation_tree.root
 
         while True:
             if isinstance(current_stack_element, SemanticAction):
-                current_stack_element.execute(
-                    current_derivation_node
-                )  # TODO: change parameters after
+                # current_stack_element.execute(
+                #     current_derivation_node
+                # )  # TODO: change parameters after
+                pass
             else:
 
-                current_derivation_node = current_derivation_node.get_next()
+                # current_derivation_node = current_derivation_node.get_next()
 
                 status, token_index_increment = self.process_token(
                     tokens[current_token_index],
@@ -65,7 +65,6 @@ class SDTProcessor:
                     stack,
                     current_token_index,
                     current_stack_element,
-                    current_derivation_node,
                 )
 
                 current_token_index += token_index_increment
@@ -86,7 +85,6 @@ class SDTProcessor:
                         stack,
                         current_token_index,
                         current_stack_element,
-                        current_derivation_node,
                     )
 
                     current_token_index += token_index_increment
@@ -102,10 +100,6 @@ class SDTProcessor:
             current_token = tokens[current_token_index]
             current_stack_element = stack.pop()
 
-            # new_node = DerivationNode(current_stack_element)
-            # current_derivation_node.add_children(new_node)
-            # current_derivation_node = new_node
-
     def process_token(
         self,
         current_token: Token | str,
@@ -113,7 +107,6 @@ class SDTProcessor:
         stack: list,
         current_token_index: int,
         current_stack_element: str | Terminal | NonTerminalType | SemanticAction | Any,
-        current_derivation_node: DerivationNode,
     ) -> tuple[SyntaxReturnStatus, int]:
         """
         Analisa a lista de tokens.
@@ -130,16 +123,14 @@ class SDTProcessor:
                 ].tail
 
                 # se existe, adicionar as regras de produção na pilha
-                # stack.extend(production_rules[::-1])
-                self.add_to_stack(stack, production_rules, current_derivation_node)
-                current_derivation_node = self._derivation_tree.get_parent()
+                stack.extend(production_rules[::-1])
+                # current_derivation_node = self._derivation_tree.get_parent()
                 return SyntaxReturnStatus.OK, 0
             # se não existe a entrada na tabela de símbolos, retornar erro
             return SyntaxReturnStatus.ENTRY_DOES_NOT_EXIST, 0
         if isinstance(current_stack_element, Terminal):
             if current_token.type_ == current_stack_element:  # type: ignore
-
-                current_derivation_node.symbol = current_token  # change to token
+                # current_derivation_node.symbol = current_token  # change to token
                 return SyntaxReturnStatus.OK, 1
             return SyntaxReturnStatus.UNMATCHED_TERMINALS, 1
         if isinstance(current_stack_element, NonTerminalType):
@@ -150,8 +141,7 @@ class SDTProcessor:
                 ].tail
 
                 # se existe, adicionar as regras de produção na pilha
-                # stack.extend(production_rules[::-1])
-                self.add_to_stack(stack, production_rules, current_derivation_node)
+                stack.extend(production_rules[::-1])
                 return SyntaxReturnStatus.OK, 0
             # se não existe a entrada na tabela de símbolos, retornar erro
             return SyntaxReturnStatus.ENTRY_DOES_NOT_EXIST, 0
